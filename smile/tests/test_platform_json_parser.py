@@ -14,15 +14,14 @@
 #
 
 import unittest
-import os
 
 from smile.platform.json_configuration import *
 
 
 class TestJsonParser(unittest.TestCase):
     def test_empty_json(self):
-        json = JsonConfiguration('resource:tests/platform_json_parser/empty.json')
-        self.assertIsInstance(json, JsonConfiguration)
+        configuration = JsonConfiguration('resource:tests/platform_json_parser/empty.json')
+        self.assertIsInstance(configuration, JsonConfiguration)
 
     def test_invalid_json(self):
         with self.assertRaises(json.decoder.JSONDecodeError):

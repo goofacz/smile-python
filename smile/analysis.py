@@ -24,7 +24,7 @@ def _squeeze_results_by_mac_address(results, averaging_method):
 
     # We want to have single result per mobile node
     unique_mac_addresses = np.unique(results[:, "mac_address"])
-    unique_results = [] # Results.create_array(len(unique_mac_addresses))
+    unique_results = []  # Results.create_array(len(unique_mac_addresses))
 
     for i in range(0, len(unique_mac_addresses)):
         mac_address = unique_mac_addresses[i]
@@ -66,7 +66,7 @@ def _squeeze_results_by_mac_address(results, averaging_method):
                 "Unknown \"averaging_method\" value passed to squeeze_results(): {0}".format(averaging_method))
 
         unique_result.mac_address = mac_address
-        unique_result.position_dimensions = tmp_results[0, 'position_dimensions'] # FIXME
+        unique_result.position_dimensions = tmp_results[0, 'position_dimensions']  # FIXME
         unique_results.append(unique_result)
 
     unique_results = Results.create_array(unique_results)

@@ -55,7 +55,8 @@ class JsonConfiguration(object):
     def __len__(self):
         return len(self._content)
 
-    def __keytransform__(self, key):
+    @staticmethod
+    def __keytransform__(key):
         return key
 
     def _import_files(self, absolute_file_path, content):
@@ -89,7 +90,7 @@ class JsonConfiguration(object):
         return self._content
 
     @staticmethod
-    def _load_file( file_path):
+    def _load_file(file_path):
         with open(file_path, 'r') as handle:
             return json.load(handle)
 

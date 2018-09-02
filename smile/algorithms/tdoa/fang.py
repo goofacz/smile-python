@@ -31,7 +31,8 @@ class Fang(Solver):
         super().__init__(anchors_coordinates, distances, configuration)
         self.tdoa_distances = distances
 
-    def __forward_transformation(self, coordinates):
+    @staticmethod
+    def __forward_transformation(coordinates):
         # Translate to anchors coordinates to put first anchor at (0, 0)
         translation = coordinates[0, :].copy()
         coordinates -= translation
@@ -49,7 +50,8 @@ class Fang(Solver):
 
         return translation, angle, np.asarray(((0, 0), B, C))
 
-    def __backward_transformation(self, translation, angle, point):
+    @staticmethod
+    def __backward_transformation(translation, angle, point):
         # The same as _fang_forward_transformation() but backward
         rotation = np.array(((np.cos(-angle), -np.sin(-angle)),
                              (np.sin(-angle), np.cos(-angle))))
@@ -57,7 +59,8 @@ class Fang(Solver):
         point = np.dot(rotation, point)
         return point + translation
 
-    def __order_input(self, coordinates, distances):
+    @staticmethod
+    def __order_input(coordinates, distances):
         input_range = range(0, coordinates.shape[0])
         for indices in itertools.permutations(input_range, 3):
             indices = np.asarray(indices)
@@ -77,10 +80,10 @@ class Fang(Solver):
             raise ValueError('Invalid shape of distances array')
 
         # Reorder anchors to have R_ab != 0 (see article)
-        anchors_coordinates, distances = self.__order_input(self.anchors_coordinates, self.tdoa_distances)
+        anchors_coordinates, distances = Fang.__order_input(self.anchors_coordinates, self.tdoa_distances)
 
         # Transform coordinates to meet paper requirements
-        translation, rotation, anchors_coordinates = self.__forward_transformation(anchors_coordinates)
+        translation, rotation, anchors_coordinates = Fang.__forward_transformation(anchors_coordinates)
         if not np.isclose(anchors_coordinates[1, 1], anchors_coordinates[0, 1]):
             raise ValueError('Second anchor has to lie along a first station baseline')
 
@@ -117,7 +120,7 @@ class Fang(Solver):
 
             if np.isclose(R_ab, -tmp_R_ab) and np.isclose(R_ac, -tmp_R_ac):
                 # Backward transformation of coordinates system
-                solution = self.__backward_transformation(translation, rotation, [X, Y])
+                solution = Fang.__backward_transformation(translation, rotation, [X, Y])
                 positions.append(solution)
 
         return positions

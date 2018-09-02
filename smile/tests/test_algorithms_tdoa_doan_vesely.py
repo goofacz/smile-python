@@ -48,7 +48,9 @@ class TestDoanVesely(unittest.TestCase):
 
             if len(positions) > 1 and np.allclose(positions[0], positions[1]):
                 positions = [positions[0]]
-            positions = [position for position in positions if does_area_contain_position(position, top_left,bottom_right)]
+
+            positions = [position for position in positions if does_area_contain_position(position, top_left,
+                                                                                          bottom_right)]
 
             self.assertEqual(1, len(positions), msg=error_message)
             np.testing.assert_almost_equal(positions[0], reference_position, decimal=7, err_msg=error_message)

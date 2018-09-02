@@ -92,7 +92,7 @@ class TestGenerateTofMeasurements(unittest.TestCase):
             list(*generate_tof_measurements(np.asanyarray(()), grid_size, grid_gap))
 
         with self.assertRaises(ValueError):
-            list(*generate_tof_measurements(np.asanyarray((1)), grid_size, grid_gap))
+            list(*generate_tof_measurements(np.asanyarray(1), grid_size, grid_gap))
 
         with self.assertRaises(ValueError):
             list(*generate_tof_measurements(np.asanyarray((1, 2, 4, 5)), grid_size, grid_gap))
@@ -132,7 +132,9 @@ class TestGenerateTdoaMeasurements(unittest.TestCase):
                                  np.asanyarray((0, 1.23606798, 0, 0.41421356)),
                                  np.asanyarray((0.41421356, 0.41421356, 0.41421356, 0)))
 
-        mobile_positions, tdoa_values = zip(*generate_tdoa_measurements(reference_anchor_coordinates, grid_size, grid_gap))
+        mobile_positions, tdoa_values = zip(*generate_tdoa_measurements(reference_anchor_coordinates, grid_size,
+                                                                        grid_gap))
+
         np.testing.assert_equal(mobile_positions, reference_mobile_positions)
         np.testing.assert_almost_equal(tdoa_values, reference_tdoa_values)
 

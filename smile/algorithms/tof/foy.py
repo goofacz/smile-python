@@ -57,6 +57,8 @@ class Foy(Solver):
 
         if len(self.tof_distances.shape) == 1:
             distances = self.tof_distances[np.newaxis]
+        else:
+            distances = ()
 
         if np.count_nonzero(distances) != distances.shape[1]:
             raise ValueError('All ToF distances have to be nonzero values')
