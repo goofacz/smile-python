@@ -1,0 +1,5 @@
+{
+  "import" : [
+    "tests/platform_json_parser/cyclical_import_middle.json"
+  ]
+}

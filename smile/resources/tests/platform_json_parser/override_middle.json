@@ -1,6 +1,6 @@
 {
   "import" : [
-    "smile/tests/platform_json_parser/override_bottom.json"
+    "tests/platform_json_parser/override_bottom.json"
   ],
 
   "number" : 456,

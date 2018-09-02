@@ -15,20 +15,25 @@
 
 import json
 import os
+from pkg_resources import resource_filename
 
 import jsonmerge
 
 
 class JsonConfiguration(object):
+    _RESOURCE = "resource:"
+
     class CyclicalImportError(ValueError):
         pass
 
     def __init__(self, file_path):
-        self._smile_workspace_path = os.environ['SMILE_WORKSPACE_PATH']
+        self._resources_base_path = resource_filename("smile.resources", "")
 
-        file_path = os.path.expanduser(file_path)
-        if not os.path.isfile(file_path):
-            file_path = self._compose_absolute_file_path(self._smile_workspace_path, file_path)
+        if file_path.startswith(JsonConfiguration._RESOURCE):
+            file_path = file_path[len(JsonConfiguration._RESOURCE):]
+            file_path = self._compose_absolute_file_path(self._resources_base_path, file_path)
+        else:
+            file_path = os.path.expanduser(file_path)
 
         self._content = JsonConfiguration._load_file(file_path)
         self._imported_files = [file_path]
@@ -91,6 +96,6 @@ class JsonConfiguration(object):
     def _compose_absolute_file_path(self, base_directory_path, file_path):
         absolute_file_path = os.path.abspath(os.path.join(base_directory_path, file_path))
         if not os.path.isfile(absolute_file_path):
-            absolute_file_path = os.path.abspath(os.path.join(self._smile_workspace_path, file_path))
+            absolute_file_path = os.path.abspath(os.path.join(self._resources_base_path, file_path))
 
         return absolute_file_path

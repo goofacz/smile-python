@@ -17,16 +17,21 @@ import json
 import os
 import numpy as np
 import shapely.geometry as sg
+from pkg_resources import resource_filename
 
 
 class Area(object):
+    _RESOURCE = "resource:"
+
     class InvalidContentError(ValueError):
         pass
 
     def __init__(self, file_path):
-        file_path = os.path.expanduser(file_path)
-        if not os.path.isfile(file_path):
-            file_path = os.path.abspath(os.path.join(os.environ['SMILE_WORKSPACE_PATH'], file_path))
+        if file_path.startswith(Area._RESOURCE):
+            file_path = file_path[len(Area._RESOURCE):]
+            file_path = os.path.abspath(os.path.join(resource_filename("smile.resources", ""), file_path))
+        else:
+            file_path = os.path.expanduser(file_path)
 
         with open(file_path, 'r') as handle:
             content = json.load(handle)

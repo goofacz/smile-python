@@ -20,23 +20,16 @@ from smile.platform.json_configuration import *
 
 
 class TestJsonParser(unittest.TestCase):
-    def setUp(self):
-        self.original_environ = os.environ.copy()
-        os.environ['SMILE_WORKSPACE_PATH'] = ''
-
-    def tearDown(self):
-        os.environ = self.original_environ
-
     def test_empty_json(self):
-        json = JsonConfiguration('smile/tests/platform_json_parser/empty.json')
+        json = JsonConfiguration('resource:tests/platform_json_parser/empty.json')
         self.assertIsInstance(json, JsonConfiguration)
 
     def test_invalid_json(self):
         with self.assertRaises(json.decoder.JSONDecodeError):
-            JsonConfiguration('smile/tests/platform_json_parser/invalid.json')
+            JsonConfiguration('resource:tests/platform_json_parser/invalid.json')
 
     def test_disjoint_jsons(self):
-        json = JsonConfiguration('smile/tests/platform_json_parser/disjoint_top.json')
+        json = JsonConfiguration('resource:tests/platform_json_parser/disjoint_top.json')
 
         self.assertFalse('import' in json)
 
@@ -48,10 +41,10 @@ class TestJsonParser(unittest.TestCase):
 
     def test_cyclical_jsons(self):
         with self.assertRaises(JsonConfiguration.CyclicalImportError):
-            JsonConfiguration('smile/tests/platform_json_parser/cyclical_import_top.json')
+            JsonConfiguration('resource:tests/platform_json_parser/cyclical_import_top.json')
 
     def test_override_jsons(self):
-        json = JsonConfiguration('smile/tests/platform_json_parser/override_top.json')
+        json = JsonConfiguration('resource:tests/platform_json_parser/override_top.json')
 
         self.assertFalse('import' in json)
 
@@ -69,7 +62,7 @@ class TestJsonParser(unittest.TestCase):
         self.assertSequenceEqual(json['object']['collection'], [4, 5, 6])
 
     def test_relative_jsons(self):
-        json = JsonConfiguration('smile/tests/platform_json_parser/relative_top.json')
+        json = JsonConfiguration('resource:tests/platform_json_parser/relative_top.json')
 
         self.assertFalse('import' in json)
 

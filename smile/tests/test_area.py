@@ -24,16 +24,16 @@ import smile.area as sa
 class TestArea(unittest.TestCase):
     def test_create_with_invalid_json(self):
         with self.assertRaises(sa.Area.InvalidContentError):
-            sa.Area('smile/tests/area/invalid.json')
+            sa.Area('resource:tests/area/invalid.json')
 
     def test_create_with_correct_json(self):
-        area = sa.Area('smile/tests/area/square.json')
+        area = sa.Area('resource:tests/area/square.json')
         self.assertIsInstance(area, sa.Area)
 
 
 class TestAreaContains(unittest.TestCase):
     def setUp(self):
-        self.area = sa.Area('smile/tests/area/square.json')
+        self.area = sa.Area('resource:tests/area/square.json')
 
     def test_point_inside_area(self):
         inside_point = sg.Point(10, 10)
