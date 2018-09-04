@@ -13,10 +13,10 @@
 # along with this program.  If not, see http:#www.gnu.org/licenses/.
 #
 
+from os.path import expanduser, abspath
 import numpy as np
 
 from smile.array import Array
-from os.path import expanduser, abspath
 
 
 class Nodes(Array):

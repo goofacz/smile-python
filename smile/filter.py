@@ -16,7 +16,7 @@
 import numpy as np
 
 
-class Filter(object):
+class Filter:
     def __init__(self, array):
         self.array = array
 

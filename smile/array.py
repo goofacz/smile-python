@@ -53,7 +53,7 @@ class Array(np.ndarray):
 
             return slice(None, None, None), self.column_names[index]
 
-        elif type(index) in (list, tuple):
+        elif isinstance(index, (list, tuple)):
             if len(index) == 1:
                 index = index[0]
 
@@ -61,7 +61,7 @@ class Array(np.ndarray):
                 if isinstance(index[0], str):
                     raise IndexError('Rows cannot be indexed with string names')
 
-                elif type(index[0]) in (list, tuple) and type(index[0][0]) is np.ndarray:
+                elif isinstance(index[0], (list, tuple)) and isinstance(index[0][0], np.ndarray):
                     index = (index[0][0], index[1])
 
                 if isinstance(index[1], str):
@@ -78,8 +78,8 @@ class Array(np.ndarray):
     def _process_index(self, index):
         if len(self.shape) == 1:
             return self._process_vector_index(index)
-        else:
-            return self._process_array_index(index)
+
+        return self._process_array_index(index)
 
 
 def sort(array, column):

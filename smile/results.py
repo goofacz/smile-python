@@ -18,7 +18,7 @@ import numpy as np
 from smile.array import Array
 
 
-class Result(object):
+class Result:
     def __init__(self):
         self.position_dimensions = None
         self.position_x = None
