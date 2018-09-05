@@ -16,10 +16,11 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import smile
 
 # -- Project information -----------------------------------------------------
 
-project = 'smile-python'
+project = 'SMILe'
 copyright = '2018, Tomasz Jankowski'
 author = 'Tomasz Jankowski'
 
@@ -39,6 +40,7 @@ release = '0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
