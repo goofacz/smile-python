@@ -12,11 +12,14 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+import matplotlib
 
-import smile
+# Disable warning generated for smile.visualization
+matplotlib.use('AGG')
+
+sys.path.insert(0, os.path.abspath('../smile'))
 
 # -- Project information -----------------------------------------------------
 
@@ -34,13 +37,15 @@ release = '0.1'
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
-# needs_sphinx = '1.0'
+needs_sphinx = '1.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinxcontrib.apidoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -155,3 +160,9 @@ texinfo_documents = [
      author, 'smile-python', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+# apidoc options
+apidoc_module_dir = '../smile'
+apidoc_output_dir = 'api'
+apidoc_excluded_paths = ['tests', 'resources', 'scripts']
+apidoc_separate_modules = True
