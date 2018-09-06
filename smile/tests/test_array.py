@@ -21,7 +21,7 @@ from smile.array import *
 class TestArray(unittest.TestCase):
     class Data(Array):
         def __init__(self, *args):
-            super(Data, self).__init__()
+            super(TestArray.Data, self).__init__()
             self.column_names['first'] = 0
             self.column_names['second'] = 1
             self.column_names['third'] = 2
@@ -45,33 +45,29 @@ class TestArray(unittest.TestCase):
         np.testing.assert_equal(result, [2, 20, 200])
 
         result = data[:, 2]
-        self.assertFalse(isinstance(result, TestArray.Data))
-        self.assertTrue(isinstance(result, np.ndarray))
+        self.assertTrue(isinstance(result, TestArray.Data))
         np.testing.assert_equal(result, [100, 200, 300])
 
         result = data[:, (0, 2)]
-        self.assertFalse(isinstance(result, TestArray.Data))
-        self.assertTrue(isinstance(result, np.ndarray))
+        self.assertTrue(isinstance(result, TestArray.Data))
         np.testing.assert_equal(result, [[1, 100],
                                          [2, 200],
                                          [3, 300]])
 
         result = data[(0, 2)]
+        self.assertTrue(isinstance(result, np.int64))
         self.assertEqual(result, 100)
 
         result = data['third']
-        self.assertFalse(isinstance(result, TestArray.Data))
-        self.assertTrue(isinstance(result, np.ndarray))
+        self.assertTrue(isinstance(result, TestArray.Data))
         np.testing.assert_equal(result, [100, 200, 300])
 
         result = data[2, 'second']
-        self.assertFalse(isinstance(result, TestArray.Data))
         self.assertTrue(isinstance(result, np.int64))
         self.assertEqual(result, 30)
 
         result = data[:, 'first']
-        self.assertFalse(isinstance(result, TestArray.Data))
-        self.assertTrue(isinstance(result, np.ndarray))
+        self.assertTrue(isinstance(result, TestArray.Data))
         np.testing.assert_equal(result, [1, 2, 3])
 
         result = data[np.where(data['first'] == 2)]
