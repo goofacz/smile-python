@@ -22,12 +22,11 @@ import shapely.geometry as sg
 
 class Area:
     """
-    Read and manipulate simulation area defined in JSON files
+    Read and manipulate simulation area defined in JSON files.
 
-    JSON format
-    -----------
-    File is expected to contain single list named "vertices".
-    The list should contain vertices (X, Y) describing simulation area
+    File is expected to receive path to JSON file contain single list named
+    "vertices". The list should contain vertices (X, Y) describing simulation
+    area:
 
      >>> {
      >>>   "vertices": [
@@ -41,7 +40,7 @@ class Area:
 
     class InvalidContentError(ValueError):
         """
-        JSON content is invalid
+        JSON content is invalid.
         """
         pass
 
@@ -65,14 +64,10 @@ class Area:
         """
         Checks whether point is inside or close to the area.
 
-        Parameters
-        ----------
-        point : point like
-            The point.
-        rtol : float
-            The relative tolerance parameter.
-        atol : float
-            The absolute tolerance parameter.
+        Args:
+            point (point like): The point.
+            rtol (float): The relative tolerance parameter.
+            atol (float): The absolute tolerance parameter.
         """
         if not isinstance(point, sg.Point):
             point = sg.Point(point)

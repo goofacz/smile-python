@@ -1,4 +1,4 @@
-SMILe Python Analysis Package
+SMILe Analysis Package
 ========================================
 
 API Documentation

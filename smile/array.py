@@ -17,6 +17,31 @@ import numpy as np
 
 
 class Array(np.ndarray):
+    """
+    A thin wrapper for numpy.ndarray adjusting it to SMILe needs, while remaining
+    fully compatible with numpy routines.
+
+    Array lets user to index array using human-readable column names.
+
+    Array is intended to be used as a base class and classes built on top of it
+    defines human-readable column names.
+
+    >>> class Data(Array):
+    >>>     def __init__(self, *args):
+    >>>         super(self.__class__, self).__init__()
+    >>>         self.column_names['first'] = 0
+    >>>         self.column_names['second'] = 1
+    >>>         self.column_names['third'] = 2
+    >>>
+    >>> data = Data([[1, 10, 100],
+    >>>              [2, 20, 200],
+    >>>              [3, 30, 300]])
+    >>>
+    >>> result = data[(0, 2)] # Result: 100
+    >>> result = data['third'] # Result: [100, 200, 300]
+    >>> result = data[2, 'second'] # Result: 30
+    >>> result = data[:, 'first'] # Result: [1, 2, 3]
+    """
     def __new__(cls, *args, **kargs):
         instance = np.asarray(*args, **kargs).view(cls)
         instance.column_names = {}
