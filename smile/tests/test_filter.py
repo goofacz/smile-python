@@ -21,24 +21,25 @@ from smile.filter import Filter
 
 
 class TestFilter(unittest.TestCase):
-    data = np.array([[1, 20, 300, 4000],
-                     [2, 30, 400, 5000],
-                     [3, 40, 500, 6000],
-                     [4, 50, 600, 7000],
-                     [5, 60, 700, 8000],
-                     [6, 70, 800, 9000],
-                     [7, 80, 900, 0],
-                     [8, 90, 0, 1000],
-                     [9, 0, 100, 2000]])
+    def setUp(self):
+        self.data = np.array([[1, 20, 300, 4000],
+                              [2, 30, 400, 5000],
+                              [3, 40, 500, 6000],
+                              [4, 50, 600, 7000],
+                              [5, 60, 700, 8000],
+                              [6, 70, 800, 9000],
+                              [7, 80, 900, 0],
+                              [8, 90, 0, 1000],
+                              [9, 0, 100, 2000]])
 
     def test_execute_equal_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.equal(0, 3)
         result = data_filter.finish()
         np.testing.assert_equal(result, [[3, 40, 500, 6000]])
 
     def test_execute_less_equal_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.less_equal(1, 40)
         result = data_filter.finish()
         np.testing.assert_equal(result, [[1, 20, 300, 4000],
@@ -47,21 +48,21 @@ class TestFilter(unittest.TestCase):
                                          [9, 0, 100, 2000]])
 
     def test_execute_less_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.less(2, 200)
         result = data_filter.finish()
         np.testing.assert_equal(result, [[8, 90, 0, 1000],
                                          [9, 0, 100, 2000]])
 
     def test_execute_greater_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.greater(2, 700)
         result = data_filter.finish()
         np.testing.assert_equal(result, [[6, 70, 800, 9000],
                                          [7, 80, 900, 0]])
 
     def test_execute_greater_equal_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.greater_equal(2, 700)
         result = data_filter.finish()
         np.testing.assert_equal(result, [[5, 60, 700, 8000],
@@ -69,7 +70,7 @@ class TestFilter(unittest.TestCase):
                                          [7, 80, 900, 0]])
 
     def test_execute_in_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.is_in(2, (300, 100, 600))
         result = data_filter.finish()
         np.testing.assert_equal(result, [[1, 20, 300, 4000],
@@ -77,13 +78,13 @@ class TestFilter(unittest.TestCase):
                                          [9, 0, 100, 2000]])
 
     def test_execute_not_in_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.is_not_in(2, (100, 300, 500, 600, 700, 800, 900, 0))
         result = data_filter.finish()
         np.testing.assert_equal(result, [[2, 30, 400, 5000]])
 
     def test_execute_not_equal_condition(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.not_equal(2, 500)
         result = data_filter.finish()
         np.testing.assert_equal(result, [[1, 20, 300, 4000],
@@ -96,7 +97,7 @@ class TestFilter(unittest.TestCase):
                                          [9, 0, 100, 2000]])
 
     def test_execute_complex_cases(self):
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.greater_equal(0, 3)
         data_filter.less(1, 90)
         data_filter.is_in(2, (0, 700, 900))
@@ -104,7 +105,7 @@ class TestFilter(unittest.TestCase):
         np.testing.assert_equal(result, [[5, 60, 700, 8000],
                                          [7, 80, 900, 0]])
 
-        data_filter = Filter(TestFilter.data)
+        data_filter = Filter(self.data)
         data_filter.greater_equal(0, 7)
         data_filter.less(1, 50)
         data_filter.is_in(2, (0, 700, 900))

@@ -40,7 +40,7 @@ class TestAnalysis(unittest.TestCase):
         self.dummy_result.end_true_position_y = 0.
         self.dummy_result.end_true_position_z = 0.
 
-    def test_absolute_position_error_histogram(self):
+    def test_absolute_position_error_histogram_single_element(self):
         results = Results.create_array(3, 2)
         results[0, "begin_true_position_2d"] = (0, 0)
         results[0, "position_2d"] = (15, 0)
@@ -66,7 +66,7 @@ class TestAnalysis(unittest.TestCase):
         self.assertEqual(15, position_errors[1])
         self.assertAlmostEqual(sqrt(2 * 10 ** 2) - sqrt(2 * 6 ** 2), position_errors[2], places=10)
 
-    def test_absolute_position_error_histogram(self):
+    def test_absolute_position_error_histogram_multiple_elements(self):
         results = [self.dummy_result, self.dummy_result, self.dummy_result, self.dummy_result]
         results = Results.create_array(results)
         results[0, "begin_true_position_2d"] = (0, 0)

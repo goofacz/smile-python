@@ -21,7 +21,7 @@ from smile.array import *
 class TestArray(unittest.TestCase):
     class Data(Array):
         def __init__(self, *args):
-            super(self.__class__, self).__init__()
+            super(Data, self).__init__()
             self.column_names['first'] = 0
             self.column_names['second'] = 1
             self.column_names['third'] = 2
@@ -82,7 +82,7 @@ class TestArray(unittest.TestCase):
         self.assertTrue(isinstance(result, TestArray.Data))
         np.testing.assert_equal(result, [[3, 30, 300]])
 
-    def test_getitem_with_array(self):
+    def test_getitem_with_vector(self):
         vector = TestArray.Data([1, 20, 300, 4000])
 
         result = vector[2]
