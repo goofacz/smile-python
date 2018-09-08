@@ -16,7 +16,7 @@
 from abc import ABC, abstractmethod
 
 
-class Simulation(ABC):
+class Algorithm(ABC):
     @abstractmethod
     def __init__(self, configuration):
         pass
