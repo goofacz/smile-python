@@ -46,11 +46,11 @@ def __parse_cmd_arguments():
 
     analyser_path = os.path.join(method_path, __ANALYSER_DIRECTORY)
     if not os.path.isdir(analyser_path):
-        raise RuntimeError(f'{results_path} has to contain {__ANALYSER_DIRECTORY} directory.')
+        raise RuntimeError(f'{method_path} has to contain {__ANALYSER_DIRECTORY} directory.')
 
     experiments_path = os.path.join(method_path, __EXPERIMENTS_DIRECTORY)
     if not os.path.isdir(experiments_path):
-        raise RuntimeError(f'{results_path} has to contain {__EXPERIMENTS_DIRECTORY} directory.')
+        raise RuntimeError(f'{method_path} has to contain {__EXPERIMENTS_DIRECTORY} directory.')
 
     # Validate results_path
     if not os.path.isdir(results_path):
