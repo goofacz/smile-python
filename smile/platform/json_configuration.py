@@ -73,7 +73,13 @@ class JsonConfiguration(object):
         # JSONs merging order is from bottom to top
         merged_imported_content = {}
         for imported_file in imported_files:
-            absolute_imported_file_path = self._compose_absolute_file_path(base_directory_path, imported_file)
+            if imported_file.startswith(JsonConfiguration._RESOURCE):
+                absolute_imported_file_path = imported_file[len(JsonConfiguration._RESOURCE):]
+                absolute_imported_file_path = self._compose_absolute_file_path(self._resources_base_path,
+                                                                               absolute_imported_file_path)
+            else:
+                absolute_imported_file_path = self._compose_absolute_file_path(base_directory_path, imported_file)
+
             if absolute_imported_file_path in self._imported_files:
                 raise JsonConfiguration.CyclicalImportError(
                     f'Cyclical import occurred, file {imported_file} was already imported')
