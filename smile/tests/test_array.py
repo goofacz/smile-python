@@ -21,10 +21,12 @@ from smile.array import *
 class TestArray(unittest.TestCase):
     class Data(Array):
         def __init__(self, *args):
-            super(TestArray.Data, self).__init__()
-            self.column_names['first'] = 0
-            self.column_names['second'] = 1
-            self.column_names['third'] = 2
+            column_names = {
+                'first': 0,
+                'second': 1,
+                'third': 2
+            }
+            super(TestArray.Data, self).__init__(column_names)
 
     def test_construction(self):
         TestArray.Data([0, 1, 2])
@@ -212,6 +214,31 @@ class TestArray(unittest.TestCase):
                                          [7, 80, 900],
                                          [8, 90, 1000]])
 
+    def test_getattribute_with_array(self):
+        data = TestArray.Data([[1, 10, 100],
+                               [2, 20, 200],
+                               [3, 30, 300]])
+
+        np.testing.assert_equal(data.first, [1, 2, 3])
+        np.testing.assert_equal(data.third, [100, 200, 300])
+
+    def test_getattribute_with_vector(self):
+        data = TestArray.Data([[1, 10, 100]])
+        self.assertEqual(data.first, 1)
+        self.assertEqual(data.third, 100)
+
+    def test_creating_array_with_invalid_column_name(self):
+        class InvalidArray(Array):
+            def __init__(self, *args):
+                column_names = {
+                    'first': 0,
+                    'copy': 1
+                }
+
+                super(InvalidArray, self).__init__(column_names)
+
+        with self.assertRaises(Array.InvalidColumnNameError):
+            InvalidArray([[1, 10, 100]])
 
 class TestSort(unittest.TestCase):
     def test_sort(self):

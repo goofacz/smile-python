@@ -18,10 +18,9 @@ import numpy as np
 
 class Array(np.ndarray):
     """
-    A thin wrapper for numpy.ndarray adjusting it to SMILe needs, while remaining
-    fully compatible with numpy routines.
-
-    Array lets user to index array using human-readable column names.
+    A thin wrapper for numpy.ndarray extending it's indexing capabilities. Array lets user
+    to index arrays using human-readable column names inside brackets. Moreover, columns
+    are accessible using attributes. Array remains full compatible wth umPy routines.
 
     Array is intended to be used as a base class and classes built on top of it
     defines human-readable column names.
@@ -41,11 +40,26 @@ class Array(np.ndarray):
     >>> result = data['third'] # Result: [100, 200, 300]
     >>> result = data[2, 'second'] # Result: 30
     >>> result = data[:, 'first'] # Result: [1, 2, 3]
+    >>>
+    >>> result = data.first # Result: [1, 2, 3]
+    >>> result = data.first[1] # Result: 2
     """
+
+    class InvalidColumnNameError(RuntimeError):
+        pass
+
     def __new__(cls, *args, **kargs):
         instance = np.asarray(*args, **kargs).view(cls)
         instance.column_names = {}
         return instance
+
+    def __init__(self, column_names):
+        for column_name in column_names:
+            if hasattr(self, column_name):
+                raise Array.InvalidColumnNameError(f'"{column_name}" cannot be used as column name, '
+                                                   f'it shadows some ndarray attribute!')
+
+        self.column_names = column_names
 
     def __array_finalize__(self, instance):
         if instance is not None:
@@ -61,6 +75,15 @@ class Array(np.ndarray):
     def __setitem__(self, index, value):
         index = self._process_index(index)
         return super(Array, self).__setitem__(index, value)
+
+    def __getattribute__(self, item):
+        if item == 'column_names' or item.startswith('_'):
+            return super(Array, self).__getattribute__(item)
+        else:
+            if item in self.column_names:
+                return self[:, item]
+            else:
+                return super(Array, self).__getattribute__(item)
 
     def _process_vector_index(self, index):
         if isinstance(index, str):

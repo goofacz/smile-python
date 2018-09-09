@@ -21,36 +21,39 @@ from smile.array import Array
 
 class Frames(Array):
     def __init__(self, *args):
-        super(Frames, self).__init__()
-        self.column_names["node_mac_address"] = 0
-        self.column_names["direction"] = 1
-        self.column_names["begin_clock_timestamp"] = 2
-        self.column_names["begin_simulation_timestamp"] = 3
-        self.column_names["begin_true_position_x"] = 4
-        self.column_names["begin_true_position_y"] = 5
-        self.column_names["begin_true_position_z"] = 6
-        self.column_names["end_clock_timestamp"] = 7
-        self.column_names["end_simulation_timestamp"] = 8
-        self.column_names["end_true_position_x"] = 9
-        self.column_names["end_true_position_y"] = 10
-        self.column_names["end_true_position_z"] = 11
-        self.column_names["source_mac_address"] = 12
-        self.column_names["destination_mac_address"] = 13
-        self.column_names["sequence_number"] = 14
+        column_names = {
+            "node_mac_address": 0,
+            "direction": 1,
+            "begin_clock_timestamp": 2,
+            "begin_simulation_timestamp": 3,
+            "begin_true_position_x": 4,
+            "begin_true_position_y": 5,
+            "begin_true_position_z": 6,
+            "end_clock_timestamp": 7,
+            "end_simulation_timestamp": 8,
+            "end_true_position_x": 9,
+            "end_true_position_y": 10,
+            "end_true_position_z": 11,
+            "source_mac_address": 12,
+            "destination_mac_address": 13,
+            "sequence_number": 14
+        }
 
-        self.column_names["begin_true_position_2d"] = (self.column_names["begin_true_position_x"],
-                                                       self.column_names["begin_true_position_y"])
+        column_names["begin_true_position_2d"] = (column_names["begin_true_position_x"],
+                                                  column_names["begin_true_position_y"])
 
-        self.column_names["begin_true_position_3d"] = (self.column_names["begin_true_position_x"],
-                                                       self.column_names["begin_true_position_y"],
-                                                       self.column_names["begin_true_position_z"])
+        column_names["begin_true_position_3d"] = (column_names["begin_true_position_x"],
+                                                  column_names["begin_true_position_y"],
+                                                  column_names["begin_true_position_z"])
 
-        self.column_names["end_true_position_2d"] = (self.column_names["end_true_position_x"],
-                                                     self.column_names["end_true_position_y"])
+        column_names["end_true_position_2d"] = (column_names["end_true_position_x"],
+                                                column_names["end_true_position_y"])
 
-        self.column_names["end_true_position_3d"] = (self.column_names["end_true_position_x"],
-                                                     self.column_names["end_true_position_y"],
-                                                     self.column_names["end_true_position_z"])
+        column_names["end_true_position_3d"] = (column_names["end_true_position_x"],
+                                                column_names["end_true_position_y"],
+                                                column_names["end_true_position_z"])
+
+        super(Frames, self).__init__(column_names)
 
     @staticmethod
     def load_csv(file_path):

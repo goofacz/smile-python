@@ -53,7 +53,7 @@ class Result:
 
 class Results(Array):
     def __init__(self, *args):
-        super(Results, self).__init__()
+        super(Results, self).__init__({})
         self.column_names["position_dimensions"] = 0
         self.column_names["position_x"] = 1
         self.column_names["position_y"] = 2

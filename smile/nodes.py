@@ -21,18 +21,21 @@ from smile.array import Array
 
 class Nodes(Array):
     def __init__(self, *args):
-        super(Nodes, self).__init__()
-        self.column_names["mac_address"] = 0
-        self.column_names["position_x"] = 1
-        self.column_names["position_y"] = 2
-        self.column_names["position_z"] = 3
+        column_names = {
+            "mac_address": 0,
+            "position_x": 1,
+            "position_y": 2,
+            "position_z": 3
+        }
 
-        self.column_names["position_2d"] = (self.column_names["position_x"],
-                                            self.column_names["position_y"])
+        column_names["position_2d"] = (column_names["position_x"],
+                                       column_names["position_y"])
 
-        self.column_names["position_3d"] = (self.column_names["position_x"],
-                                            self.column_names["position_y"],
-                                            self.column_names["position_z"])
+        column_names["position_3d"] = (column_names["position_x"],
+                                       column_names["position_y"],
+                                       column_names["position_z"])
+
+        super(Nodes, self).__init__(column_names)
 
     @staticmethod
     def load_csv(file_path):
