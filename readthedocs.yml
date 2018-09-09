@@ -2,4 +2,6 @@ build:
     image: latest
 
 python:
+    use_system_site_packages: true
+    setup_py_install: true
     version: 3.6
