@@ -61,4 +61,5 @@ class Frames(Array):
     __column_converters = _get_base_column_converters()
 
     def __new__(cls, input_array):
-        return super(Frames, cls).__new__(cls, input_array, Frames.__column_names, Frames.__column_converters)
+        return super(Frames, cls).__new__(cls, input_array, Frames.__column_names,
+                                          column_converters=Frames.__column_converters)

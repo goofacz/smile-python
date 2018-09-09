@@ -38,4 +38,4 @@ class Nodes(Array):
     _column_names = _get__base_column_names()
 
     def __new__(cls, input_array):
-        return super(Nodes, cls).__new__(cls, input_array, Nodes._column_names, None)
+        return super(Nodes, cls).__new__(cls, input_array, Nodes._column_names)

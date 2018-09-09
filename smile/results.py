@@ -95,7 +95,7 @@ class Results(Array):
 
     def __new__(cls, input_array):
         input_array = [row.to_tuple() for row in input_array]
-        instance = super(Results, cls).__new__(cls, input_array, Results.__column_names, None)
+        instance = super(Results, cls).__new__(cls, input_array, Results.__column_names)
 
         unique = np.unique(instance['position_dimensions'])
         if unique.shape != (1,):

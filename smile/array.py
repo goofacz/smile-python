@@ -18,19 +18,26 @@ import numpy as np
 
 class Array(np.ndarray):
     """
-    A thin wrapper for numpy.ndarray extending it's indexing capabilities. Array lets user
-    to index arrays using human-readable column names inside brackets. Moreover, columns
-    are accessible using attributes. Array remains full compatible wth umPy routines.
+    Array extends NumPy ndarray with following features:
+    - Human-readable column names.
+    - Enriched indexing using column labels in brackets and as attributes.
 
-    Array is intended to be used as a base class and classes built on top of it
-    defines human-readable column names.
+    Array remains fully compatible wth NumPy routines. It is intended to be
+    used as a base class for other array types.
+
+    Array uses float64 as base type.
+
+    Example showing how to inherit from Array and how to use new indexing
+    capabilities.
 
     >>> class Data(Array):
-    >>>     def __init__(self, *args):
-    >>>         super(self.__class__, self).__init__()
-    >>>         self.column_names['first'] = 0
-    >>>         self.column_names['second'] = 1
-    >>>         self.column_names['third'] = 2
+    >>>     def __new__(cls, input_array):
+    >>>         column_names = {
+    >>>             'first': 0,
+    >>>             'second': 1,
+    >>>             'third': 2,
+    >>>         }
+    >>>         return super(Data, cls).__new__(cls, input_array)
     >>>
     >>> data = Data([[1, 10, 100],
     >>>              [2, 20, 200],
@@ -52,14 +59,30 @@ class Array(np.ndarray):
         pass
 
     class InvalidArgumentError(RuntimeError):
+        """
+        Raised when Array is constructed with unacceptable input_array type.
+        """
         pass
 
-    def __new__(cls, input_array, column_names, column_converters):
+    def __new__(cls, input_array, column_names, column_converters=None):
+        """
+        Constructs new Array-based class instance.
+
+        Args:
+            input_array: (str, file-like, sequence) CSV file path, file, file-like object (e.g. StringIO) or
+                                                    sequence of input data (e.g. list of lists).
+            column_names: (dict) Column labels (label: index mapping).
+            column_converters: (dict, optional) Functions converting columns' content to array's dtype.
+
+        Returns:
+            New class instance.
+        """
         if isinstance(input_array, np.ndarray):
             pass
         elif isinstance(input_array, str) or hasattr(input_array, 'read'):
             # Catch strings (file paths) and file-like objects (file, StringIO)
-            input_array = np.loadtxt(input_array, delimiter=',', converters=column_converters, ndmin=2)
+            input_array = np.loadtxt(input_array, delimiter=',', converters=column_converters, ndmin=2,
+                                     dtype=np.float64)
         elif hasattr(input_array, '__iter__'):
             # Catch sequences like lists and tuples
             input_array = np.asarray(input_array)
