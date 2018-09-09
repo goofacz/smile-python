@@ -14,18 +14,14 @@
 #
 
 
-def mac_address_to_string(mac_address):
+def mac_address_to_string(mac):
     """
-    Converts MAC address from int to pretty string (e.g, XX-XX-XX-XX-XX-XX).
+    Converts MAC identifier from int to pretty string (e.g, XX-XX-XX-XX-XX-XX).
 
-    Parameters
-    ----------
-    mac_address : int
-        MAC address
+    Args
+        mac_address (int): 48 but MAC identifier.
 
     Returns
-    -------
-    str
-        Pretty string with MAC address
+        String with MAC identifier.
     """
-    return '-'.join(format(x, '02X') for x in int(mac_address).to_bytes(6, 'big'))
+    return '-'.join(format(x, '02X') for x in int(mac).to_bytes(6, 'big'))

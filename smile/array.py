@@ -19,6 +19,7 @@ import numpy as np
 class Array(np.ndarray):
     """
     Array extends NumPy ndarray with following features:
+
     - Human-readable column names.
     - Enriched indexing using column labels in brackets and as attributes.
 

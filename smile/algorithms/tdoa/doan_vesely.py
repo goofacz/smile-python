@@ -21,20 +21,34 @@ from smile.algorithms.solver import Solver
 
 class DoanVesely(Solver):
     """
-    S. Van Doan and J. Vesely, "The effectivity comparison of TDOA analytical solution methods,"
-    2015 16th International Radar Symposium (IRS), Dresden, 2015, pp. 800-805.
+    Implements TDoA solver discussed in:
+
+    - S. Van Doan and J. Vesely, "The effectivity comparison of TDOA analytical solution methods,"
+      2015 16th International Radar Symposium (IRS), Dresden, 2015, pp. 800-805.
     """
 
     def __init__(self, anchors_coordinates, distances, configuration):
+        """
+        Construct solver instance.
+
+        Args:
+            anchors_coordinates (ndarray): 2D coordinates of three anchor nodes.
+            distances (ndarray): Distances between object and anchors.
+            configuration (optional: Unused.
+
+        Raises:
+            ValueError: Raised when arguments does not meet requirements.
+        """
+
+        if anchors_coordinates.shape != (3, 2):
+            raise ValueError('Invalid shape of anchors coordinates array')
+        if distances.shape != (3,):
+            raise ValueError('Invalid shape of distances array')
+
         super().__init__(anchors_coordinates, distances, configuration)
         self.tdoa_distances = distances
 
     def localize(self):
-        if self.anchors_coordinates.shape != (3, 2):
-            raise ValueError('Invalid shape of anchors coordinates array')
-        if self.tdoa_distances.shape != (3,):
-            raise ValueError('Invalid shape of distances array')
-
         L = self.tdoa_distances[1]
         R = self.tdoa_distances[2]
         Xl = self.anchors_coordinates[1, 0] - self.anchors_coordinates[0, 0]

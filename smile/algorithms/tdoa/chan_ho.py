@@ -21,14 +21,32 @@ from smile.algorithms.solver import Solver
 
 class ChanHo(Solver):
     """
-    Y. T. Chan and K. C. Ho, "A simple and efficient estimator for hyperbolic location," in IEEE Transactions on Signal
-    Processing, vol. 42, no. 8, pp. 1905-1915, Aug 1994.
+    Implements TDoA solver discussed in:
 
-    K. C. Ho and Y. T. Chan, "Solution and performance analysis of geolocation by TDOA," in IEEE Transactions
-    on Aerospace and Electronic Systems, vol. 29, no. 4, pp. 1311-1322, Oct 1993.
+    - Y. T. Chan and K. C. Ho, "A simple and efficient estimator for hyperbolic location," in IEEE Transactions
+      on Signal Processing, vol. 42, no. 8, pp. 1905-1915, Aug 1994.
+
+    - K. C. Ho and Y. T. Chan, "Solution and performance analysis of geolocation by TDOA," in IEEE Transactions
+      on Aerospace and Electronic Systems, vol. 29, no. 4, pp. 1311-1322, Oct 1993.
     """
 
     def __init__(self, anchors_coordinates, distances, configuration):
+        """
+        Construct solver instance.
+
+        Args:
+            anchors_coordinates (ndarray): 2D coordinates of three anchor nodes.
+            distances (ndarray): Distances between object and anchors.
+            configuration (optional: Unused.
+
+        Raises:
+            ValueError: Raised when arguments does not meet requirements.
+        """
+        if anchors_coordinates.shape != (3, 2):
+            raise ValueError('Invalid shape of anchors coordinates array')
+        if distances.shape != (3,):
+            raise ValueError('Invalid shape of distances array')
+
         super().__init__(anchors_coordinates, distances, configuration)
         self.tdoa_distances = self.distances
 

@@ -23,11 +23,29 @@ from smile.algorithms.solver import Solver
 
 class Fang(Solver):
     """
-    B. T. Fang, "Simple solutions for hyperbolic and related position fixes," in IEEE Transactions on Aerospace
-    and Electronic Systems, vol. 26, no. 5, pp. 748-753, Sep 1990.
+    Implements TDoA solver discussed in:
+
+    - B. T. Fang, "Simple solutions for hyperbolic and related position fixes," in IEEE Transactions on Aerospace
+      and Electronic Systems, vol. 26, no. 5, pp. 748-753, Sep 1990.
     """
 
     def __init__(self, anchors_coordinates, distances, configuration):
+        """
+        Construct solver instance.
+
+        Args:
+            anchors_coordinates (ndarray): 2D coordinates of three anchor nodes.
+            distances (ndarray): Distances between object and anchors.
+            configuration (optional: Unused.
+
+        Raises:
+            ValueError: Raised when arguments does not meet requirements.
+        """
+        if anchors_coordinates.shape != (3, 2):
+            raise ValueError('Invalid shape of anchors coordinates array')
+        if distances.shape != (3,):
+            raise ValueError('Invalid shape of distances array')
+
         super().__init__(anchors_coordinates, distances, configuration)
         self.tdoa_distances = distances
 

@@ -21,9 +21,15 @@ import jsonmerge
 
 
 class JsonConfiguration(object):
+    """
+    Parses algorithm configuration stored in JSON files.
+    """
     _RESOURCE = "resource:"
 
     class CyclicalImportError(ValueError):
+        """
+        Raised when cyclical import between JSON files is found.
+        """
         pass
 
     def __init__(self, file_path):
