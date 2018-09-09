@@ -16,7 +16,7 @@
 from smile.array import Array
 
 
-def _get__base_column_names():
+def _get_base_column_names():
     column_names = {
         "node_mac_address": 0,
         "direction": 1,
@@ -57,9 +57,14 @@ def _get_base_column_converters():
 
 
 class Frames(Array):
-    __column_names = _get__base_column_names()
-    __column_converters = _get_base_column_converters()
+    _column_names = _get_base_column_names()
+    _column_converters = _get_base_column_converters()
 
-    def __new__(cls, input_array):
-        return super(Frames, cls).__new__(cls, input_array, Frames.__column_names,
-                                          column_converters=Frames.__column_converters)
+    def __new__(cls, input_array, column_names=None, column_converters=None):
+        if not column_names:
+            column_names = Frames._column_names
+        if not column_converters:
+            column_converters = Frames._column_converters
+
+        return super(Frames, cls).__new__(cls, input_array, column_names,
+                                          column_converters=column_converters)
