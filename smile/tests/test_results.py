@@ -111,7 +111,7 @@ class TestResults(unittest.TestCase):
         self.reference_results = [self.result1, self.result2, self.result3]
 
     def test_create_array_success(self):
-        results = Results.create_array(self.reference_results)
+        results = Results(self.reference_results)
 
         np.testing.assert_array_equal(results[0, :], self.result1.to_tuple())
         np.testing.assert_array_equal(results[1, :], self.result2.to_tuple())
@@ -125,7 +125,7 @@ class TestResults(unittest.TestCase):
         self.reference_results = [self.result1, self.result2, self.result3]
 
         with self.assertRaises(ValueError):
-            Results.create_array(self.reference_results)
+            Results(self.reference_results)
 
 
 if __name__ == '__main__':

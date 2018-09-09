@@ -94,7 +94,7 @@ class TestAnalysis(unittest.TestCase):
         self.reference_results = [self.result1, self.result2, self.result3, self.result4, self.result5]
 
     def test_squeeze_results_mean(self):
-        results = Results.create_array(self.reference_results)
+        results = Results(self.reference_results)
 
         unique_results = squeeze_results(results, grouping_method="mac_address", averaging_method="mean")
         self.assertTupleEqual((3, 11), unique_results.shape)
@@ -112,7 +112,7 @@ class TestAnalysis(unittest.TestCase):
         np.testing.assert_equal((700, 800), unique_results[2, "end_true_position_2d"])
 
     def test_squeeze_results_max(self):
-        results = Results.create_array(self.reference_results)
+        results = Results(self.reference_results)
 
         unique_results = squeeze_results(results, grouping_method="mac_address", averaging_method="max")
         self.assertTupleEqual((3, 11), unique_results.shape)
@@ -130,7 +130,7 @@ class TestAnalysis(unittest.TestCase):
         np.testing.assert_equal((700, 800), unique_results[2, "end_true_position_2d"])
 
     def test_squeeze_results_min(self):
-        results = Results.create_array(self.reference_results)
+        results = Results(self.reference_results)
 
         unique_results = squeeze_results(results, grouping_method="mac_address", averaging_method="min")
         self.assertTupleEqual((3, 11), unique_results.shape)

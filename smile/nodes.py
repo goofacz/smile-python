@@ -19,26 +19,26 @@ import numpy as np
 from smile.array import Array
 
 
+def _get__base_column_names():
+    column_names = {
+        "mac_address": 0,
+        "position_x": 1,
+        "position_y": 2,
+        "position_z": 3
+    }
+
+    column_names["position_2d"] = (column_names["position_x"],
+                                   column_names["position_y"])
+
+    column_names["position_3d"] = (column_names["position_x"],
+                                   column_names["position_y"],
+                                   column_names["position_z"])
+
+    return column_names
+
+
 class Nodes(Array):
-    def __init__(self, *args):
-        column_names = {
-            "mac_address": 0,
-            "position_x": 1,
-            "position_y": 2,
-            "position_z": 3
-        }
+    _column_names = _get__base_column_names()
 
-        column_names["position_2d"] = (column_names["position_x"],
-                                       column_names["position_y"])
-
-        column_names["position_3d"] = (column_names["position_x"],
-                                       column_names["position_y"],
-                                       column_names["position_z"])
-
-        super(Nodes, self).__init__(column_names)
-
-    @staticmethod
-    def load_csv(file_path):
-        if isinstance(file_path, str):
-            file_path = abspath(expanduser(file_path))
-        return Nodes(np.loadtxt(file_path, delimiter=',', ndmin=2))
+    def __new__(cls, input_array):
+        return super(Nodes, cls).__new__(cls, input_array, Nodes._column_names, None)

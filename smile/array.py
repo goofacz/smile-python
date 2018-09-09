@@ -46,24 +46,42 @@ class Array(np.ndarray):
     """
 
     class InvalidColumnNameError(RuntimeError):
+        """
+        Raised when any of column names shadows any of ndarray's attribute name.
+        """
         pass
 
-    def __new__(cls, *args, **kargs):
-        instance = np.asarray(*args, **kargs).view(cls)
-        instance.column_names = {}
-        return instance
+    class InvalidArgumentError(RuntimeError):
+        pass
 
-    def __init__(self, column_names):
-        for column_name in column_names:
-            if hasattr(self, column_name):
+    def __new__(cls, input_array, column_names, column_converters):
+        if isinstance(input_array, np.ndarray):
+            pass
+        elif isinstance(input_array, str) or hasattr(input_array, 'read'):
+            # Catch strings (file paths) and file-like objects (file, StringIO)
+            input_array = np.loadtxt(input_array, delimiter=',', converters=column_converters, ndmin=2)
+        elif hasattr(input_array, '__iter__'):
+            # Catch sequences like lists and tuples
+            input_array = np.asarray(input_array)
+        else:
+            raise Array.InvalidArgumentError(f'input_array has unacceptable type {str(type(input_array))}')
+
+        instance = np.asarray(input_array).view(cls)
+        instance.column_names = {}
+
+        for column_name in column_names.keys():
+            if hasattr(instance, column_name.lower()) or hasattr(instance, column_name.upper()):
                 raise Array.InvalidColumnNameError(f'"{column_name}" cannot be used as column name, '
                                                    f'it shadows some ndarray attribute!')
+        instance.column_names = column_names
 
-        self.column_names = column_names
+        return instance
 
     def __array_finalize__(self, instance):
-        if instance is not None:
-            self.column_names = getattr(instance, 'column_names', None)
+        if instance is None:
+            return
+
+        self.column_names = getattr(instance, 'column_names', None)
 
     def __array_wrap__(self, out_arr, context=None):
         return np.ndarray.__array_wrap__(self.view(type(self)), out_arr, context)
@@ -81,7 +99,7 @@ class Array(np.ndarray):
             return super(Array, self).__getattribute__(item)
         else:
             if item in self.column_names:
-                return self[:, item]
+                return self[:, self.column_names[item]]
             else:
                 return super(Array, self).__getattribute__(item)
 

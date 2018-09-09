@@ -20,13 +20,14 @@ from smile.array import *
 
 class TestArray(unittest.TestCase):
     class Data(Array):
-        def __init__(self, *args):
+        def __new__(cls, input_array):
             column_names = {
                 'first': 0,
                 'second': 1,
                 'third': 2
             }
-            super(TestArray.Data, self).__init__(column_names)
+
+            return super(TestArray.Data, cls).__new__(cls, input_array, column_names, None)
 
     def test_construction(self):
         TestArray.Data([0, 1, 2])
@@ -224,21 +225,24 @@ class TestArray(unittest.TestCase):
 
     def test_getattribute_with_vector(self):
         data = TestArray.Data([[1, 10, 100]])
+        print(data.__repr__())
         self.assertEqual(data.first, 1)
         self.assertEqual(data.third, 100)
 
     def test_creating_array_with_invalid_column_name(self):
         class InvalidArray(Array):
-            def __init__(self, *args):
+            def __new__(cls, input_array):
                 column_names = {
                     'first': 0,
-                    'copy': 1
+                    'copy': 1,
+                    'flags': 2
                 }
 
-                super(InvalidArray, self).__init__(column_names)
+                return super(InvalidArray, cls).__new__(cls, input_array, column_names, None)
 
         with self.assertRaises(Array.InvalidColumnNameError):
             InvalidArray([[1, 10, 100]])
+
 
 class TestSort(unittest.TestCase):
     def test_sort(self):

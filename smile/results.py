@@ -18,6 +18,45 @@ import numpy as np
 from smile.array import Array
 
 
+def _get__base_column_names():
+        column_names = {
+            "position_dimensions": 0,
+            "position_x": 1,
+            "position_y": 2,
+            "position_z": 3,
+            "begin_true_position_x": 4,
+            "begin_true_position_y": 5,
+            "begin_true_position_z": 6,
+            "end_true_position_x": 7,
+            "end_true_position_y": 8,
+            "end_true_position_z": 9,
+            "mac_address": 10
+        }
+
+        column_names["position_2d"] = (column_names["position_x"],
+                                       column_names["position_y"])
+
+        column_names["position_3d"] = (column_names["position_x"],
+                                       column_names["position_y"],
+                                       column_names["position_z"])
+
+        column_names["begin_true_position_2d"] = (column_names["begin_true_position_x"],
+                                                  column_names["begin_true_position_y"])
+
+        column_names["begin_true_position_3d"] = (column_names["begin_true_position_x"],
+                                                  column_names["begin_true_position_y"],
+                                                  column_names["begin_true_position_z"])
+
+        column_names["end_true_position_2d"] = (column_names["end_true_position_x"],
+                                                column_names["end_true_position_y"])
+
+        column_names["end_true_position_3d"] = (column_names["end_true_position_x"],
+                                                column_names["end_true_position_y"],
+                                                column_names["end_true_position_z"])
+
+        return column_names
+
+
 class Result:
     def __init__(self):
         self.position_dimensions = None
@@ -52,48 +91,15 @@ class Result:
 
 
 class Results(Array):
-    def __init__(self, *args):
-        super(Results, self).__init__({})
-        self.column_names["position_dimensions"] = 0
-        self.column_names["position_x"] = 1
-        self.column_names["position_y"] = 2
-        self.column_names["position_z"] = 3
-        self.column_names["begin_true_position_x"] = 4
-        self.column_names["begin_true_position_y"] = 5
-        self.column_names["begin_true_position_z"] = 6
-        self.column_names["end_true_position_x"] = 7
-        self.column_names["end_true_position_y"] = 8
-        self.column_names["end_true_position_z"] = 9
-        self.column_names["mac_address"] = 10
+    __column_names = _get__base_column_names()
 
-        self.column_names["position_2d"] = (self.column_names["position_x"],
-                                            self.column_names["position_y"])
+    def __new__(cls, input_array):
+        input_array = [row.to_tuple() for row in input_array]
+        instance = super(Results, cls).__new__(cls, input_array, Results.__column_names, None)
 
-        self.column_names["position_3d"] = (self.column_names["position_x"],
-                                            self.column_names["position_y"],
-                                            self.column_names["position_z"])
-
-        self.column_names["begin_true_position_2d"] = (self.column_names["begin_true_position_x"],
-                                                       self.column_names["begin_true_position_y"])
-
-        self.column_names["begin_true_position_3d"] = (self.column_names["begin_true_position_x"],
-                                                       self.column_names["begin_true_position_y"],
-                                                       self.column_names["begin_true_position_z"])
-
-        self.column_names["end_true_position_2d"] = (self.column_names["end_true_position_x"],
-                                                     self.column_names["end_true_position_y"])
-
-        self.column_names["end_true_position_3d"] = (self.column_names["end_true_position_x"],
-                                                     self.column_names["end_true_position_y"],
-                                                     self.column_names["end_true_position_z"])
-
-    @staticmethod
-    def create_array(rows):
-        results = [row.to_tuple() for row in rows]
-        results = Results(results)
-
-        unique = np.unique(results['position_dimensions'])
+        unique = np.unique(instance['position_dimensions'])
         if unique.shape != (1,):
             raise ValueError('Array cannot store 2d and 3D positions at the same time')
 
-        return results
+        return instance
+

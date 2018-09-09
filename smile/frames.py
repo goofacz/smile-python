@@ -19,54 +19,49 @@ import numpy as np
 from smile.array import Array
 
 
+def _get__base_column_names():
+    column_names = {
+        "node_mac_address": 0,
+        "direction": 1,
+        "begin_clock_timestamp": 2,
+        "begin_simulation_timestamp": 3,
+        "begin_true_position_x": 4,
+        "begin_true_position_y": 5,
+        "begin_true_position_z": 6,
+        "end_clock_timestamp": 7,
+        "end_simulation_timestamp": 8,
+        "end_true_position_x": 9,
+        "end_true_position_y": 10,
+        "end_true_position_z": 11,
+        "source_mac_address": 12,
+        "destination_mac_address": 13,
+        "sequence_number": 14
+    }
+
+    column_names["begin_true_position_2d"] = (column_names["begin_true_position_x"],
+                                              column_names["begin_true_position_y"])
+
+    column_names["begin_true_position_3d"] = (column_names["begin_true_position_x"],
+                                              column_names["begin_true_position_y"],
+                                              column_names["begin_true_position_z"])
+
+    column_names["end_true_position_2d"] = (column_names["end_true_position_x"],
+                                            column_names["end_true_position_y"])
+
+    column_names["end_true_position_3d"] = (column_names["end_true_position_x"],
+                                            column_names["end_true_position_y"],
+                                            column_names["end_true_position_z"])
+
+    return column_names
+
+
+def _get_base_column_converters():
+    return {1: lambda value: hash(value)}
+
+
 class Frames(Array):
-    def __init__(self, *args):
-        column_names = {
-            "node_mac_address": 0,
-            "direction": 1,
-            "begin_clock_timestamp": 2,
-            "begin_simulation_timestamp": 3,
-            "begin_true_position_x": 4,
-            "begin_true_position_y": 5,
-            "begin_true_position_z": 6,
-            "end_clock_timestamp": 7,
-            "end_simulation_timestamp": 8,
-            "end_true_position_x": 9,
-            "end_true_position_y": 10,
-            "end_true_position_z": 11,
-            "source_mac_address": 12,
-            "destination_mac_address": 13,
-            "sequence_number": 14
-        }
+    __column_names = _get__base_column_names()
+    __column_converters = _get_base_column_converters()
 
-        column_names["begin_true_position_2d"] = (column_names["begin_true_position_x"],
-                                                  column_names["begin_true_position_y"])
-
-        column_names["begin_true_position_3d"] = (column_names["begin_true_position_x"],
-                                                  column_names["begin_true_position_y"],
-                                                  column_names["begin_true_position_z"])
-
-        column_names["end_true_position_2d"] = (column_names["end_true_position_x"],
-                                                column_names["end_true_position_y"])
-
-        column_names["end_true_position_3d"] = (column_names["end_true_position_x"],
-                                                column_names["end_true_position_y"],
-                                                column_names["end_true_position_z"])
-
-        super(Frames, self).__init__(column_names)
-
-    @staticmethod
-    def load_csv(file_path):
-        """
-        Loads frames from CSV file.
-
-        :param file_path: Path to CSV file
-        """
-        converters = Frames._get_default_converters()
-        if isinstance(file_path, str):
-            file_path = abspath(expanduser(file_path))
-        return Frames(np.loadtxt(file_path, delimiter=',', converters=converters, ndmin=2))
-
-    @staticmethod
-    def _get_default_converters():
-        return {1: lambda value: hash(value)}
+    def __new__(cls, input_array):
+        return super(Frames, cls).__new__(cls, input_array, Frames.__column_names, Frames.__column_converters)

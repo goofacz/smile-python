@@ -69,7 +69,7 @@ def _squeeze_results_by_mac_address(results, averaging_method):
         unique_result.position_dimensions = tmp_results[0, 'position_dimensions']  # FIXME
         unique_results.append(unique_result)
 
-    unique_results = Results.create_array(unique_results)
+    unique_results = Results(unique_results)
     return unique_results
 
 

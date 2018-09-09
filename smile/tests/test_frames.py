@@ -27,19 +27,19 @@ class TestFrames(unittest.TestCase):
         "98765432,TX,140001177591,140001177591,37.500000,37.500000,0.000000,140011177591,140011177591,37.500000,37.500000,0.000000,17592186044417,281474976710655,2"
 
     def test_load_csv(self):
-        frames = Frames.load_csv(StringIO(TestFrames.content))
+        frames = Frames(StringIO(TestFrames.content))
         self.assertTrue(isinstance(frames, np.ndarray))
         self.assertTupleEqual((2, 15), frames.shape)
 
         # Check load_csv() faults
-        with self.assertRaises(ValueError):
-            Frames.load_csv(None)
+        with self.assertRaises(Frames.InvalidArgumentError):
+            Frames(None)
 
         with self.assertRaises(OSError):
-            Frames.load_csv("nonexisting file")
+            Frames("nonexisting file")
 
     def test_column_access(self):
-        frames = Frames.load_csv(StringIO(TestFrames.content))
+        frames = Frames(StringIO(TestFrames.content))
 
         np.testing.assert_equal((hash('RX'), hash('TX')), frames["direction"])
 

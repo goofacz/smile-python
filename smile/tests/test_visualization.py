@@ -42,7 +42,7 @@ class TestAnalysis(unittest.TestCase):
 
     def test_absolute_position_error_histogram_multiple_elements(self):
         results = [self.dummy_result, self.dummy_result, self.dummy_result, self.dummy_result]
-        results = Results.create_array(results)
+        results = Results(results)
         results[0, "begin_true_position_2d"] = (0, 0)
         results[0, "position_2d"] = (15, 0)
         results[0, "end_true_position_2d"] = (20, 0)
