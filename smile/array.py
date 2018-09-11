@@ -65,6 +65,9 @@ class Array(np.ndarray):
         """
         pass
 
+    class NonUniqueValuesError(RuntimeError):
+        pass
+
     def __new__(cls, input_array, column_names, column_converters=None):
         """
         Constructs new Array-based class instance.
@@ -130,9 +133,9 @@ class Array(np.ndarray):
         if item == 'column_names' or item.startswith('_'):
             return super(Array, self).__getattribute__(item)
         else:
-            if item in self.column_names:
+            try:
                 return self[:, self.column_names[item]]
-            else:
+            except KeyError:
                 return super(Array, self).__getattribute__(item)
 
     def _process_column_index(self, index):
@@ -188,6 +191,33 @@ class Array(np.ndarray):
             raise IndexError(f'Invalid Array index: {index}')
 
         return index
+
+    def order_by(self, values):
+        if not isinstance(values, np.ndarray):
+            raise ValueError('Input values has to be a np.ndarray')
+
+        if (self.ndim != 1) or (values.ndim != 1):
+            raise ValueError(f'Input values (ndim: {values.ndim}) and self '
+                             f'(ndim: {self.ndim}) have to be a vectors')
+
+        if len(self) != len(values):
+            raise ValueError(f'Input values (len: {len(values)}) and self '
+                             f'(len: {len(self)}) have to be the same size')
+
+        _, counts = np.unique(values, return_counts=True)
+        if any([count != 1 for count in counts]):
+            raise Array.NonUniqueValuesError('Input values has to be unique')
+
+        _, counts = np.unique(self, return_counts=True)
+        if any([count != 1 for count in counts]):
+            raise Array.NonUniqueValuesError('Column/row has to contain unique values')
+
+        values = values.tolist()
+        pairs = [(value, index[0]) for index, value in np.ndenumerate(self)]
+        sorted_pairs = sorted(pairs, key=lambda pair: values.index(pair[0]))
+        _, indices = zip(*sorted_pairs)
+
+        return indices
 
 
 def sort(array, column):

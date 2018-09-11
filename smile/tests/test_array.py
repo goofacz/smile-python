@@ -34,7 +34,7 @@ class TestArrayConstruct(unittest.TestCase):
         Data([0, 1, 2])
 
 
-class TestArray(unittest.TestCase):
+class TestArrayIndexing(unittest.TestCase):
     def setUp(self):
         self.data = Data([[0, 1, 2],
                           [3, 4, 5],
@@ -188,6 +188,49 @@ class TestArray(unittest.TestCase):
     def test_invalid_column_by_intr(self):
         with self.assertRaises(IndexError):
             self.data[2]
+
+
+class TestArrayOrderBy(unittest.TestCase):
+    def setUp(self):
+        self.data = Data([[1, 2, 3],
+                          [7, 8, 9],
+                          [4, 5, 6]])
+
+    def test_success(self):
+        indices = self.data.first.order_by(np.asarray([4, 1, 7]))
+        result = self.data[indices, :]
+        np.testing.assert_equal(result, [[4, 5, 6],
+                                         [1, 2, 3],
+                                         [7, 8, 9]])
+
+    def test_self_is_array(self):
+        with self.assertRaises(ValueError):
+            self.data.order_by(np.asarray([4, 1, 1]))
+
+    def test_values_is_array(self):
+        with self.assertRaises(ValueError):
+            self.data.first.order_by(np.asarray([[4, 1, 7],
+                                                 [5, 9, 2]]))
+
+    def test_values_array_diff_size(self):
+        with self.assertRaises(ValueError):
+            self.data.first.order_by(np.asarray([4, 1, 7, 9]))
+
+    def test_values_not_in_array(self):
+        with self.assertRaises(ValueError):
+            self.data.first.order_by(np.asarray([4, 1, 9]))
+
+    def test_non_unique_values(self):
+        with self.assertRaises(Array.NonUniqueValuesError):
+            self.data.first.order_by(np.asarray([4, 1, 1]))
+
+    def test_non_unique_column(self):
+        invalid_data = Data([[1, 2, 3],
+                             [1, 8, 9],
+                             [4, 5, 6]])
+
+        with self.assertRaises(Array.NonUniqueValuesError):
+            invalid_data.first.order_by(np.asarray([4, 1, 7]))
 
 
 class TestSort(unittest.TestCase):
