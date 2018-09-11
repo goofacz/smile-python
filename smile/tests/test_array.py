@@ -18,230 +18,176 @@ import unittest
 from smile.array import *
 
 
-class TestArray(unittest.TestCase):
-    class Data(Array):
-        def __new__(cls, input_array):
-            column_names = {
-                'first': 0,
-                'second': 1,
-                'third': 2
-            }
+class Data(Array):
+    def __new__(cls, input_array):
+        column_names = {
+            'first': 0,
+            'second': 1,
+            'third': 2
+        }
 
-            return super(TestArray.Data, cls).__new__(cls, input_array, column_names, None)
+        return super(Data, cls).__new__(cls, input_array, column_names, None)
 
+
+class TestArrayConstruct(unittest.TestCase):
     def test_construction(self):
-        TestArray.Data([0, 1, 2])
+        Data([0, 1, 2])
 
-    def test_getitem_with_array(self):
-        data = TestArray.Data([[1, 10, 100],
-                               [2, 20, 200],
-                               [3, 30, 300]])
 
-        result = data[:, :]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[1, 10, 100],
-                                         [2, 20, 200],
-                                         [3, 30, 300]])
+class TestArray(unittest.TestCase):
+    def setUp(self):
+        self.data = Data([[0, 1, 2],
+                          [3, 4, 5],
+                          [6, 7, 8]])
 
-        result = data[1, :]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [2, 20, 200])
-
-        result = data[:, 2]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [100, 200, 300])
-
-        result = data[:, (0, 2)]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[1, 100],
-                                         [2, 200],
-                                         [3, 300]])
-
-        result = data[(0, 2)]
+    # Single element
+    def test_single_element_by_int(self):
+        result = self.data[1, 2]
         self.assertTrue(isinstance(result, np.int64))
-        self.assertEqual(result, 100)
+        self.assertEqual(result, 5)
 
-        result = data['third']
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [100, 200, 300])
+        self.data[2, 1] = -1
+        np.testing.assert_equal(self.data, [[0, 1, 2],
+                                            [3, 4, 5],
+                                            [6, -1, 8]])
 
-        result = data[2, 'second']
+    def test_single_element_by_int_str(self):
+        result = self.data[1, 'first']
         self.assertTrue(isinstance(result, np.int64))
-        self.assertEqual(result, 30)
+        self.assertEqual(result, 3)
 
-        result = data[:, 'first']
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [1, 2, 3])
+        self.data[2, 'first'] = 6
+        np.testing.assert_equal(self.data, [[0, 1, 2],
+                                            [3, 4, 5],
+                                            [6, 7, 8]])
 
-        result = data[np.where(data['first'] == 2)]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[2, 20, 200]])
+    # Single row
+    def test_single_row_by_int_range(self):
+        result = self.data[2, :]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [6, 7, 8])
 
-        result = data[data['second'] == 30]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[3, 30, 300]])
+        self.data[2, :] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, 1, 2],
+                                            [3, 4, 5],
+                                            [-1, -2, -3]])
 
-    def test_getitem_with_vector(self):
-        vector = TestArray.Data([1, 20, 300, 4000])
+    def test_single_row_by_int_ints(self):
+        result = self.data[2, [0, 1, 2]]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [6, 7, 8])
 
-        result = vector[2]
-        self.assertTrue(isinstance(result, np.int64))
-        self.assertEqual(result, 300)
+        self.data[1, [0, 1, 2]] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, 1, 2],
+                                            [-1, -2, -3],
+                                            [6, 7, 8]])
 
-        result = vector[:]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, vector)
+    def test_single_row_by_int_strs(self):
+        result = self.data[1, ['first', 'second', 'third']]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [3, 4, 5])
 
-        result = vector[1:3]
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [20, 300])
+        self.data[0, ['first', 'second', 'third']] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[-1, -2, -3],
+                                            [3, 4, 5],
+                                            [6, 7, 8]])
 
-        result = vector['third']
-        self.assertTrue(isinstance(result, np.int64))
-        np.testing.assert_equal(result, 300)
+    def test_single_row_by_int_mixed(self):
+        result = self.data[1, ['first', 'second', 2]]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [3, 4, 5])
 
-    def test_setitem_with_array(self):
-        reference_data = TestArray.Data([[1, 10, 100],
-                                         [2, 20, 200],
-                                         [3, 30, 300]])
+        self.data[1, ['first', 'second', 2]] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, 1, 2],
+                                            [-1, -2, -3],
+                                            [6, 7, 8]])
 
-        data = reference_data.copy()
-        data[:, :] = [[5, 50, 500],
-                      [6, 60, 600],
-                      [7, 70, 700]]
-        np.testing.assert_equal(data, [[5, 50, 500],
-                                       [6, 60, 600],
-                                       [7, 70, 700]])
+    # Single column
+    def test_single_column_by_str(self):
+        result = self.data['second']
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [1, 4, 7])
 
-        data = reference_data.copy()
-        data[1, :] = (7, 8, 9)
-        np.testing.assert_equal(data, [[1, 10, 100],
-                                       [7, 8, 9],
-                                       [3, 30, 300]])
+        self.data['first'] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[-1, 1, 2],
+                                            [-2, 4, 5],
+                                            [-3, 7, 8]])
 
-        data = reference_data.copy()
-        data[:, 1] = (7, 8, 9)
-        np.testing.assert_equal(data, [[1, 7, 100],
-                                       [2, 8, 200],
-                                       [3, 9, 300]])
+    def test_single_column_by_range_int(self):
+        result = self.data[:, 0]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [0, 3, 6])
 
-        data = reference_data.copy()
-        data[:, 'second'] = (11, 12, 13)
-        np.testing.assert_equal(data, [[1, 11, 100],
-                                       [2, 12, 200],
-                                       [3, 13, 300]])
-        data = reference_data.copy()
-        data['third'] = (71, 72, 73)
-        np.testing.assert_equal(data, [[1, 10, 71],
-                                       [2, 20, 72],
-                                       [3, 30, 73]])
+        self.data[:, 1] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, -1, 2],
+                                            [3, -2, 5],
+                                            [6, -3, 8]])
 
-    def test_setitem_with_vector(self):
-        vector = TestArray.Data([1, 20, 300, 4000])
+    def test_single_column_by_range_str(self):
+        result = self.data[:, 'second']
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [1, 4, 7])
 
-        data = vector.copy()
-        data[:] = [11, 12, 13, 14]
-        np.testing.assert_equal(data, [11, 12, 13, 14])
+        self.data[:, 'second'] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, -1, 2],
+                                            [3, -2, 5],
+                                            [6, -3, 8]])
 
-        data = vector.copy()
-        data[3] = 99
-        np.testing.assert_equal(data, [1, 20, 300, 99])
+    def test_single_column_by_ints_int(self):
+        result = self.data[[0, 1, 2], 0]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [0, 3, 6])
 
-        data = vector.copy()
-        data[0:2] = [99, 98]
-        np.testing.assert_equal(data, [99, 98, 300, 4000])
+        self.data[[0, 1, 2], 0] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[-1, 1, 2],
+                                            [-2, 4, 5],
+                                            [-3, 7, 8]])
 
-        data = vector.copy()
-        data['third'] = 127
-        np.testing.assert_equal(data, [1, 20, 127, 4000])
+    def test_single_column_by_ints_str(self):
+        result = self.data[[0, 1, 2], 'second']
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [1, 4, 7])
 
-    def test_numpy_compatibility(self):
-        # Run some numpy functions on Array to make sure they still work
-        reference_a = TestArray.Data([[1, 10, 100],
-                                      [2, 20, 200],
-                                      [3, 30, 300]])
+        self.data[[0, 1, 2], 'third'] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, 1, -1],
+                                            [3, 4, -2],
+                                            [6, 7, -3]])
 
-        reference_b = np.array([[5, 60, 700],
-                                [5, 60, 700],
-                                [5, 60, 700]])
+    # Subset
+    def test_subset_1(self):
+        result = self.data[1:, 'second']
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [4, 7])
 
-        a = reference_a.copy()
-        result = np.sum(a, axis=0)
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [6, 60, 600])
+        self.data[:2, ['second', 'first']] = [[-1, -2],
+                                              [-3, -4]]
 
-        a = reference_a.copy()
-        result = a.T
-        np.testing.assert_equal(result, [[1, 2, 3],
-                                         [10, 20, 30],
-                                         [100, 200, 300]])
+        np.testing.assert_equal(self.data, [[-2, -1, 2],
+                                            [-4, -3, 5],
+                                            [6, 7, 8]])
 
-        a = reference_a.copy()
-        result = np.isnan(a)
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[False, False, False],
-                                         [False, False, False],
-                                         [False, False, False]])
+    def test_subset_2(self):
+        result = self.data[[0, 2], [0, 'third']]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [0, 8])
 
-        a = reference_a.copy()
-        b = reference_b.copy()
-        a += b
-        self.assertTrue(isinstance(a, TestArray.Data))
-        np.testing.assert_equal(a, [[6, 70, 800],
-                                    [7, 80, 900],
-                                    [8, 90, 1000]])
+        self.data[[0, 2], [0, 'third']] = [-1, -2]
+        np.testing.assert_equal(self.data, [[-1, 1, 2],
+                                            [3, 4, 5],
+                                            [6, 7, -2]])
 
-        a = reference_a.copy()
-        b = reference_b.copy()
-        b += a
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(b, [[6, 70, 800],
-                                    [7, 80, 900],
-                                    [8, 90, 1000]])
+    # Invalid indexing
+    def test_invalid_row_by_str(self):
+        with self.assertRaises(IndexError):
+            self.data['one', 0]
 
-        a = reference_a.copy()
-        b = reference_b.copy()
-        result = np.add(a, b)
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[6, 70, 800],
-                                         [7, 80, 900],
-                                         [8, 90, 1000]])
+    def test_invalid_column_by_incorrect_str(self):
+        with self.assertRaises(IndexError):
+            self.data[0, 'tenth']
 
-        a = reference_a.copy()
-        b = reference_b.copy()
-        result = np.add(b, a)
-        self.assertTrue(isinstance(result, TestArray.Data))
-        np.testing.assert_equal(result, [[6, 70, 800],
-                                         [7, 80, 900],
-                                         [8, 90, 1000]])
-
-    def test_getattribute_with_array(self):
-        data = TestArray.Data([[1, 10, 100],
-                               [2, 20, 200],
-                               [3, 30, 300]])
-
-        np.testing.assert_equal(data.first, [1, 2, 3])
-        np.testing.assert_equal(data.third, [100, 200, 300])
-
-    def test_getattribute_with_vector(self):
-        data = TestArray.Data([[1, 10, 100]])
-        print(data.__repr__())
-        self.assertEqual(data.first, 1)
-        self.assertEqual(data.third, 100)
-
-    def test_creating_array_with_invalid_column_name(self):
-        class InvalidArray(Array):
-            def __new__(cls, input_array):
-                column_names = {
-                    'first': 0,
-                    'copy': 1,
-                    'flags': 2
-                }
-
-                return super(InvalidArray, cls).__new__(cls, input_array, column_names, None)
-
-        with self.assertRaises(Array.InvalidColumnNameError):
-            InvalidArray([[1, 10, 100]])
+    def test_invalid_column_by_intr(self):
+        with self.assertRaises(IndexError):
+            self.data[2]
 
 
 class TestSort(unittest.TestCase):
