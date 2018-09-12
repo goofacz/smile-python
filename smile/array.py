@@ -53,7 +53,7 @@ class Array(np.ndarray):
     >>> result = data.first[1] # Result: 2
     """
 
-    class InvalidColumnNameError(RuntimeError):
+    class ForbiddenColumnNameError(RuntimeError):
         """
         Raised when any of column names shadows any of ndarray's attribute name.
         """
@@ -68,6 +68,12 @@ class Array(np.ndarray):
     class NonUniqueValuesError(RuntimeError):
         """
         Raised when elements in sequence are not unique.
+        """
+        pass
+
+    class UnknownColumnLabelError(IndexError):
+        """
+        Raised when column label was not found.
         """
         pass
 
@@ -101,7 +107,7 @@ class Array(np.ndarray):
 
         for column_name in column_names.keys():
             if hasattr(instance, column_name.lower()) or hasattr(instance, column_name.upper()):
-                raise Array.InvalidColumnNameError(f'"{column_name}" cannot be used as column name, '
+                raise Array.ForbiddenColumnNameError(f'"{column_name}" cannot be used as column name, '
                                                    f'it shadows some ndarray attribute!')
         instance.column_names = column_names
 
@@ -117,11 +123,7 @@ class Array(np.ndarray):
         return np.ndarray.__array_wrap__(self.view(type(self)), out_arr, context)
 
     def __getitem__(self, index):
-        if len(self.shape) == 1:
-            index = self._process_vector_index(index)
-        else:
-            index = self._process_array_index(index)
-
+        index = self._process_array_index(index)
         return super(Array, self).__getitem__(index)
 
     def __setitem__(self, index, value):
@@ -149,7 +151,7 @@ class Array(np.ndarray):
             try:
                 index = self.column_names[index]
             except KeyError as error:
-                raise IndexError(f'Unknown column name: {error}')
+                raise Array.UnknownColumnLabelError(index)
 
         elif isinstance(index, list):
             result = []
@@ -171,14 +173,12 @@ class Array(np.ndarray):
 
         return index
 
-    def _process_vector_index(self, index):
-        return self._process_column_index(index)
-
     def _process_array_index(self, index):
-        if isinstance(index, str):
-            index = slice(None, None, None), self._process_column_index(index)
+        if self.ndim == 1:
+            # Vectors have only columns
+            return self._process_column_index(index)
 
-        elif isinstance(index, np.ndarray):
+        if isinstance(index, (int, slice, np.ndarray)):
             pass
 
         elif isinstance(index, list):
@@ -190,8 +190,11 @@ class Array(np.ndarray):
             else:
                 index = index[0], self._process_column_index(index[1])
 
+        elif isinstance(index, str):
+            raise IndexError(f'Invalid row index: {index}')
+
         else:
-            raise IndexError(f'Invalid Array index: {index}')
+            raise IndexError(f'Invalid index: {index}')
 
         return index
 

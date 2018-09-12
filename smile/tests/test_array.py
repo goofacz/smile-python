@@ -62,6 +62,16 @@ class TestArrayIndexing(unittest.TestCase):
                                             [6, 7, 8]])
 
     # Single row
+    def test_single_row_by_int(self):
+        result = self.data[2]
+        self.assertTrue(isinstance(result, Data))
+        np.testing.assert_equal(result, [6, 7, 8])
+
+        self.data[2] = [-1, -2, -3]
+        np.testing.assert_equal(self.data, [[0, 1, 2],
+                                            [3, 4, 5],
+                                            [-1, -2, -3]])
+
     def test_single_row_by_int_range(self):
         result = self.data[2, :]
         self.assertTrue(isinstance(result, Data))
@@ -104,11 +114,11 @@ class TestArrayIndexing(unittest.TestCase):
 
     # Single column
     def test_single_column_by_str(self):
-        result = self.data['second']
+        result = self.data[:, 'second']
         self.assertTrue(isinstance(result, Data))
         np.testing.assert_equal(result, [1, 4, 7])
 
-        self.data['first'] = [-1, -2, -3]
+        self.data[:, 'first'] = [-1, -2, -3]
         np.testing.assert_equal(self.data, [[-1, 1, 2],
                                             [-2, 4, 5],
                                             [-3, 7, 8]])
@@ -179,15 +189,19 @@ class TestArrayIndexing(unittest.TestCase):
     # Invalid indexing
     def test_invalid_row_by_str(self):
         with self.assertRaises(IndexError):
+            self.data['one']
+
+    def test_invalid_row_by_str_int(self):
+        with self.assertRaises(IndexError):
             self.data['one', 0]
 
-    def test_invalid_column_by_incorrect_str(self):
+    def test_invalid_row_by_str_range(self):
         with self.assertRaises(IndexError):
-            self.data[0, 'tenth']
+            self.data['one', :]
 
-    def test_invalid_column_by_intr(self):
-        with self.assertRaises(IndexError):
-            self.data[2]
+    def test_invalid_column_by_incorrect_str(self):
+        with self.assertRaises(Array.UnknownColumnLabelError):
+            self.data[0, 'tenth']
 
 
 class TestArrayFindOrder(unittest.TestCase):

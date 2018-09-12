@@ -41,7 +41,7 @@ class TestFrames(unittest.TestCase):
     def test_column_access(self):
         frames = Frames(StringIO(TestFrames.content))
 
-        np.testing.assert_equal((hash('RX'), hash('TX')), frames["direction"])
+        np.testing.assert_equal((hash('RX'), hash('TX')), frames[:, "direction"])
 
         self.assertEqual(12345678, frames[0, "node_mac_address"])
         self.assertEqual(98765432, frames[1, "node_mac_address"])
