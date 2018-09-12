@@ -66,6 +66,9 @@ class Array(np.ndarray):
         pass
 
     class NonUniqueValuesError(RuntimeError):
+        """
+        Raised when elements in sequence are not unique.
+        """
         pass
 
     def __new__(cls, input_array, column_names, column_converters=None):
@@ -192,19 +195,43 @@ class Array(np.ndarray):
 
         return index
 
-    def order_by(self, values):
-        if not isinstance(values, np.ndarray):
+    def find_order(self, target_values):
+        """
+        Finds indices of elements reordered by values from `target_values`.
+
+        This method can be called only on vectors (columns or rows).
+
+        Args:
+            target_values (np.ndarray) : Desired order of elements. `target_values`
+                                         has to be a vector.
+
+        Returns:
+            Indices that can be used to reorder array.
+
+        Example:
+            >>> data = Data([[1, 2, 3],
+            >>>              [7, 8, 9],
+            >>>              [4, 5, 6]])
+            >>>
+            >>> indices = self.data.[:,0].find_order(np.asarray([4, 1, 7]))
+            >>> data = self.data[indices, :]
+            >>> # data will contain
+            >>> # [[4, 5, 6],
+            >>> #  [1, 2, 3],
+            >>> #  [7, 8, 9]])
+        """
+        if not isinstance(target_values, np.ndarray):
             raise ValueError('Input values has to be a np.ndarray')
 
-        if (self.ndim != 1) or (values.ndim != 1):
-            raise ValueError(f'Input values (ndim: {values.ndim}) and self '
+        if (self.ndim != 1) or (target_values.ndim != 1):
+            raise ValueError(f'Input values (ndim: {target_values.ndim}) and self '
                              f'(ndim: {self.ndim}) have to be a vectors')
 
-        if len(self) != len(values):
-            raise ValueError(f'Input values (len: {len(values)}) and self '
+        if len(self) != len(target_values):
+            raise ValueError(f'Input values (len: {len(target_values)}) and self '
                              f'(len: {len(self)}) have to be the same size')
 
-        _, counts = np.unique(values, return_counts=True)
+        _, counts = np.unique(target_values, return_counts=True)
         if any([count != 1 for count in counts]):
             raise Array.NonUniqueValuesError('Input values has to be unique')
 
@@ -212,9 +239,9 @@ class Array(np.ndarray):
         if any([count != 1 for count in counts]):
             raise Array.NonUniqueValuesError('Column/row has to contain unique values')
 
-        values = values.tolist()
+        target_values = target_values.tolist()
         pairs = [(value, index[0]) for index, value in np.ndenumerate(self)]
-        sorted_pairs = sorted(pairs, key=lambda pair: values.index(pair[0]))
+        sorted_pairs = sorted(pairs, key=lambda pair: target_values.index(pair[0]))
         _, indices = zip(*sorted_pairs)
 
         return indices
