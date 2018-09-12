@@ -210,12 +210,18 @@ class TestArrayFindOrder(unittest.TestCase):
                           [7, 8, 9],
                           [4, 5, 6]])
 
-    def test_success(self):
+    def test_all_values_in_array(self):
         indices = self.data.first.find_order(np.asarray([4, 1, 7]))
         result = self.data[indices, :]
         np.testing.assert_equal(result, [[4, 5, 6],
                                          [1, 2, 3],
                                          [7, 8, 9]])
+
+    def test_some_values_in_array(self):
+        indices = self.data.first.find_order(np.asarray([4, 1]))
+        result = self.data[indices, :]
+        np.testing.assert_equal(result, [[4, 5, 6],
+                                         [1, 2, 3]])
 
     def test_self_is_array(self):
         with self.assertRaises(ValueError):

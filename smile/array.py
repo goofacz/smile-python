@@ -182,7 +182,7 @@ class Array(np.ndarray):
             pass
 
         elif isinstance(index, list):
-            index = slice(None, None, None), self._process_column_index(index)
+            index = index, slice(None, None, None)
 
         elif isinstance(index, tuple):
             if len(index) == 1:
@@ -224,30 +224,28 @@ class Array(np.ndarray):
             >>> #  [7, 8, 9]])
         """
         if not isinstance(target_values, np.ndarray):
-            raise ValueError('Input values has to be a np.ndarray')
+            raise ValueError('target_values has to be a np.ndarray')
 
         if (self.ndim != 1) or (target_values.ndim != 1):
-            raise ValueError(f'Input values (ndim: {target_values.ndim}) and self '
+            raise ValueError(f'target_values (ndim: {target_values.ndim}) and self '
                              f'(ndim: {self.ndim}) have to be a vectors')
 
-        if len(self) != len(target_values):
-            raise ValueError(f'Input values (len: {len(target_values)}) and self '
-                             f'(len: {len(self)}) have to be the same size')
+        if len(self) < len(target_values):
+            raise ValueError(f'Self (len: {len(self)}) cannot be smaller than '
+                             f'target_values {len(target_values)})')
 
         _, counts = np.unique(target_values, return_counts=True)
         if any([count != 1 for count in counts]):
-            raise Array.NonUniqueValuesError('Input values has to be unique')
+            raise Array.NonUniqueValuesError('target_values has to be unique')
 
         _, counts = np.unique(self, return_counts=True)
         if any([count != 1 for count in counts]):
             raise Array.NonUniqueValuesError('Column/row has to contain unique values')
 
+        # FIXME Measure & optimize me!
         target_values = target_values.tolist()
-        pairs = [(value, index[0]) for index, value in np.ndenumerate(self)]
-        sorted_pairs = sorted(pairs, key=lambda pair: target_values.index(pair[0]))
-        _, indices = zip(*sorted_pairs)
-
-        return indices
+        values, indices = zip(*[(value, index[0]) for index, value in np.ndenumerate(self)])
+        return [indices[values.index(target_value)] for target_value in target_values]
 
 
 def sort(array, column):
