@@ -150,7 +150,7 @@ class Array(np.ndarray):
         elif isinstance(index, str):
             try:
                 index = self.column_names[index]
-            except KeyError as error:
+            except KeyError:
                 raise Array.UnknownColumnLabelError(index)
 
         elif isinstance(index, list):
@@ -175,26 +175,33 @@ class Array(np.ndarray):
 
     def _process_array_index(self, index):
         if self.ndim == 1:
-            # Vectors have only columns
-            return self._process_column_index(index)
+            if isinstance(index, tuple):
+                if len(index) == 1:
+                    index = self._process_column_index(index[0])
+                else:
+                    index = self._process_column_index(index[1])
 
-        if isinstance(index, (int, slice, np.ndarray)):
-            pass
-
-        elif isinstance(index, list):
-            index = index, slice(None, None, None)
-
-        elif isinstance(index, tuple):
-            if len(index) == 1:
-                index = index[0]
             else:
-                index = index[0], self._process_column_index(index[1])
-
-        elif isinstance(index, str):
-            raise IndexError(f'Invalid row index: {index}')
+                index = self._process_column_index(index)
 
         else:
-            raise IndexError(f'Invalid index: {index}')
+            if isinstance(index, (int, slice, np.ndarray)):
+                pass
+
+            elif isinstance(index, list):
+                index = index, slice(None, None, None)
+
+            elif isinstance(index, tuple):
+                if len(index) == 1:
+                    index = index[0]
+                else:
+                    index = index[0], self._process_column_index(index[1])
+
+            elif isinstance(index, str):
+                raise IndexError(f'Invalid row index: {index}')
+
+            else:
+                raise IndexError(f'Invalid index: {index}')
 
         return index
 
