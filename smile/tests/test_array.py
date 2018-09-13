@@ -186,6 +186,17 @@ class TestArrayIndexing(unittest.TestCase):
                                             [3, 4, 5],
                                             [6, 7, -2]])
 
+    # Iterating
+    def test_for_by_row(self):
+        result = []
+        for row in self.data:
+            result.append(row)
+
+        self.assertEqual(3, len(result))
+        np.testing.assert_equal(result[0], Data([0, 1, 2]))
+        np.testing.assert_equal(result[1], Data([3, 4, 5]))
+        np.testing.assert_equal(result[2], Data([6, 7, 8]))
+
     # Invalid indexing
     def test_invalid_row_by_str(self):
         with self.assertRaises(IndexError):
