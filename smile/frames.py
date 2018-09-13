@@ -14,6 +14,7 @@
 #
 
 from smile.array import Array
+from functools import partial
 
 
 def _get_base_column_names():
@@ -52,8 +53,34 @@ def _get_base_column_names():
     return column_names
 
 
+def _convert_direction(value):
+    value = value.decode()
+    if value in ('RX', 'TX'):
+        return hash(value)
+    else:
+        raise ValueError(f'{value} is not valid "direction"')
+
+
+def _is_positive_integral(column, value):
+    value = float(value)
+    if value >= 0. and value.is_integer():
+        return value
+    else:
+        raise ValueError(f'{value} is not valid "{column}", it has to be positive integral')
+
+
 def _get_base_column_converters():
-    return {1: lambda value: hash(value)}
+    columns = _get_base_column_names()
+    return {
+        columns['node_mac_address']: partial(_is_positive_integral, 'node_mac_address'),
+        columns['direction']: _convert_direction,
+        columns['begin_clock_timestamp']: partial(_is_positive_integral, 'begin_clock_timestamp'),
+        columns['begin_simulation_timestamp']: partial(_is_positive_integral, 'begin_simulation_timestamp'),
+        columns['end_clock_timestamp']: partial(_is_positive_integral, 'end_clock_timestamp'),
+        columns['source_mac_address']: partial(_is_positive_integral, 'source_mac_address'),
+        columns['destination_mac_address']: partial(_is_positive_integral, 'destination_mac_address'),
+        columns['sequence_number']: partial(_is_positive_integral, 'sequence_number'),
+    }
 
 
 class Frames(Array):
