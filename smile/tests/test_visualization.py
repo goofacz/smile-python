@@ -29,7 +29,7 @@ class TestAnalysis(unittest.TestCase):
     def setUp(self):
         self.dummy_result = Result()
         self.dummy_result.mac_address = 0
-        self.dummy_result.position_dimensions = 0
+        self.dummy_result.position_dimensions = 2
         self.dummy_result.position_x = 0.
         self.dummy_result.position_y = 0.
         self.dummy_result.position_z = 0.
