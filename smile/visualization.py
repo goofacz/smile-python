@@ -20,13 +20,13 @@ import numpy.linalg as npla
 
 def plot_absolute_position_error_histogram(results, return_intermediate_results=False):
     # FIXME
-    position_coordinates = 'position_2d'  # ['position_x', 'position_y', 'position_z']
-    begin_position_coordinates = 'begin_true_position_2d'  # ['begin_true_position_x', 'begin_true_position_y']
-    end_position_coordinates = 'end_true_position_2d'  # ['end_true_position_x', 'end_true_position_y']
+    position_coordinates = ['position_x', 'position_y', 'position_z']
+    begin_position_coordinates = ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
+    end_position_coordinates = ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
 
     # Mobile node cloud move during localization procedure
-    true_positions = (results[:, begin_position_coordinates] + results[:, end_position_coordinates]) / 2
-    position_errors = npla.norm(true_positions - results[:, position_coordinates], axis=1)
+    true_positions = (results[begin_position_coordinates].values + results[end_position_coordinates].values) / 2
+    position_errors = npla.norm(true_positions - results[position_coordinates].values, axis=1)
 
     # Process data (remove NaNs)
     nans_number = np.count_nonzero(np.isnan(position_errors))
@@ -45,13 +45,13 @@ def plot_absolute_position_error_histogram(results, return_intermediate_results=
 
 def plot_absolute_position_error_surface(results, anchors=None, return_intermediate_results=False):
     # FIXME
-    position_coordinates = 'position_2d'  # ['position_x', 'position_y', 'position_z']
-    begin_position_coordinates = 'begin_true_position_2d'  # ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
-    end_position_coordinates = 'end_true_position_2d'  # ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
+    position_coordinates = ['position_x', 'position_y', 'position_z']
+    begin_position_coordinates = ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
+    end_position_coordinates = ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
 
     # Mobile node cloud move during localization procedure
-    true_positions = (results[:, begin_position_coordinates] + results[:, end_position_coordinates]) / 2
-    position_errors = npla.norm(true_positions - results[:, position_coordinates], axis=1)
+    true_positions = (results[begin_position_coordinates].values + results[end_position_coordinates].values) / 2
+    position_errors = npla.norm(true_positions - results[position_coordinates], axis=1)
 
     x, y = np.meshgrid(np.unique(true_positions[:, 0]), np.unique(true_positions[:, 1]), indexing='xy')
     z = np.zeros(x.shape)
@@ -106,12 +106,12 @@ def plot_absolute_position_error_surface(results, anchors=None, return_intermedi
 
 def plot_absolute_position_error_cdf(results, return_intermediate_results=False):
     # FIXME
-    position_coordinates = 'position_2d'  # ['position_x', 'position_y']
-    begin_position_coordinates = 'begin_true_position_2d'  # ['begin_true_position_x', 'begin_true_position_y']
-    end_position_coordinates = 'end_true_position_2d'  # ['end_true_position_x', 'end_true_position_y']
+    position_coordinates = ['position_x', 'position_y', 'position_z']
+    begin_position_coordinates = ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
+    end_position_coordinates = ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
 
-    true_positions = (results[:, begin_position_coordinates] + results[:, end_position_coordinates]) / 2
-    position_errors = npla.norm(true_positions - results[:, position_coordinates], axis=1)
+    true_positions = (results[begin_position_coordinates].values + results[end_position_coordinates].values) / 2
+    position_errors = npla.norm(true_positions - results[position_coordinates], axis=1)
     position_errors = np.sort(position_errors)
     n = np.array(range(position_errors.size)) / np.float(position_errors.size)
 
