@@ -29,6 +29,9 @@ class Result:
         self.end_true_position_z = None
 
     def to_tuple(self):
+        if self.position_dimensions not in (1, 2, 3):
+            raise ValueError('Result\'s position have to me in 1, 2 or 3 dimensions')
+
         result = (
             self.mac_address,
             self.position_dimensions,

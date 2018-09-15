@@ -86,6 +86,18 @@ class TestResults(unittest.TestCase):
         with self.assertRaises(ValueError):
             sresults.create_results(self.reference_results)
 
+    def test_create_array_invalid_position_dimensions(self):
+        self.result1.position_dimensions = -1
+        self.result2.position_dimensions = 4
+        self.result3.position_dimensions = 5
+
+        with self.assertRaises(ValueError):
+            sresults.create_results([self.result1])
+        with self.assertRaises(ValueError):
+            sresults.create_results([self.result2])
+        with self.assertRaises(ValueError):
+            sresults.create_results([self.result3])
+
 
 if __name__ == '__main__':
     unittest.main()
