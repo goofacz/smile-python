@@ -14,92 +14,50 @@
 #
 
 import numpy as np
-
-from smile.array import Array
-
-
-def _get__base_column_names():
-        column_names = {
-            "position_dimensions": 0,
-            "position_x": 1,
-            "position_y": 2,
-            "position_z": 3,
-            "begin_true_position_x": 4,
-            "begin_true_position_y": 5,
-            "begin_true_position_z": 6,
-            "end_true_position_x": 7,
-            "end_true_position_y": 8,
-            "end_true_position_z": 9,
-            "mac_address": 10
-        }
-
-        column_names["position_2d"] = (column_names["position_x"],
-                                       column_names["position_y"])
-
-        column_names["position_3d"] = (column_names["position_x"],
-                                       column_names["position_y"],
-                                       column_names["position_z"])
-
-        column_names["begin_true_position_2d"] = (column_names["begin_true_position_x"],
-                                                  column_names["begin_true_position_y"])
-
-        column_names["begin_true_position_3d"] = (column_names["begin_true_position_x"],
-                                                  column_names["begin_true_position_y"],
-                                                  column_names["begin_true_position_z"])
-
-        column_names["end_true_position_2d"] = (column_names["end_true_position_x"],
-                                                column_names["end_true_position_y"])
-
-        column_names["end_true_position_3d"] = (column_names["end_true_position_x"],
-                                                column_names["end_true_position_y"],
-                                                column_names["end_true_position_z"])
-
-        return column_names
+import pandas as pd
 
 
-class Result:
-    def __init__(self):
-        self.position_dimensions = None
-        self.position_x = None
-        self.position_y = None
-        self.position_z = None
-        self.begin_true_position_x = None
-        self.begin_true_position_y = None
-        self.begin_true_position_z = None
-        self.end_true_position_x = None
-        self.end_true_position_y = None
-        self.end_true_position_z = None
-        self.mac_address = None
-
-    def to_tuple(self):
-        result = (self.position_dimensions,
-                  self.position_x,
-                  self.position_y,
-                  self.position_z,
-                  self.begin_true_position_x,
-                  self.begin_true_position_y,
-                  self.begin_true_position_z,
-                  self.end_true_position_x,
-                  self.end_true_position_y,
-                  self.end_true_position_z,
-                  self.mac_address)
-
-        if not all(element is not None for element in result):
-            raise ValueError('Result tuple cannot contain None values')
-
-        return result
+def get_results_columns():
+    return [
+        'mac_address',
+        'position_dimensions',
+        'position_x',
+        'position_y',
+        'position_z',
+        'begin_true_position_x',
+        'begin_true_position_y',
+        'begin_true_position_z',
+        'end_true_position_x',
+        'end_true_position_y',
+        'end_true_position_z',
+    ]
 
 
-class Results(Array):
-    __column_names = _get__base_column_names()
+def get_reference_position_columns():
+    return [
+        'reference_position_x',
+        'reference_position_y',
+        'reference_position_z',
+    ]
 
-    def __new__(cls, input_array):
-        input_array = [row.to_tuple() for row in input_array]
-        instance = super(Results, cls).__new__(cls, input_array, Results.__column_names)
 
-        unique = np.unique(instance[:, 'position_dimensions'])
-        if unique.shape != (1,):
-            raise ValueError('Array cannot store 2d and 3D positions at the same time')
+def _average_reference_position(begin_positions, end_positions):
+    output = (begin_positions.values + end_positions.values) / 2.
+    return pd.DataFrame(output, columns=get_reference_position_columns())
 
-        return instance
+
+def create_results(results, columns=None, reference_positions_function=None):
+    if not columns:
+        columns = get_results_columns()
+    if not reference_positions_function:
+        reference_positions_function = _average_reference_position
+
+    results = pd.DataFrame([row.to_tuple() for row in results], columns=columns, dtype=np.float64)
+    if len(results.position_dimensions.unique()) != 1:
+        raise ValueError('Position dimensions have to be the same for all results')
+
+    begin_positions = results[['begin_true_position_x', 'begin_true_position_y','begin_true_position_z']]
+    end_positions = results[['end_true_position_x', 'end_true_position_y','end_true_position_z']]
+    reference_positions = reference_positions_function(begin_positions, end_positions)
+    return results.join(reference_positions)
 

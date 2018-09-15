@@ -18,10 +18,10 @@ import matplotlib
 
 matplotlib.use('AGG')
 
-import unittest
+from smile.result import Result
+import smile.results as sresults
 from smile.visualization import *
-import numpy as np
-from smile.results import Results, Result
+import unittest
 from math import sqrt
 
 
@@ -42,29 +42,29 @@ class TestAnalysis(unittest.TestCase):
 
     def test_absolute_position_error_histogram_multiple_elements(self):
         results = [self.dummy_result, self.dummy_result, self.dummy_result, self.dummy_result]
-        results = Results(results)
-        results[0, "begin_true_position_2d"] = (0, 0)
-        results[0, "position_2d"] = (15, 0)
-        results[0, "end_true_position_2d"] = (20, 0)
+        results = sresults.create_results(results)
+        results.loc[0, ["begin_true_position_x", "begin_true_position_y"]] = (0, 0)
+        results.loc[0, ["position_x", 'position_y']] = (15, 0)
+        results.loc[0, ["end_true_position_x", "end_true_position_y"]] = (20, 0)
 
-        results[1, "begin_true_position_2d"] = (0, 0)
-        results[1, "position_2d"] = (0, 5)
-        results[1, "end_true_position_2d"] = (0, 40)
+        results.loc[1, ["begin_true_position_x", "begin_true_position_y"]] = (0, 0)
+        results.loc[1, ["position_x", 'position_y']]= (0, 5)
+        results.loc[1, ["end_true_position_x", "end_true_position_y"]] = (0, 40)
 
-        results[2, "begin_true_position_2d"] = (0, 0)
-        results[2, "position_2d"] = (6, 6)
-        results[2, "end_true_position_2d"] = (20, 20)
+        results.loc[2, ["begin_true_position_x", "begin_true_position_y"]] = (0, 0)
+        results.loc[2, ["position_x", 'position_y']] = (6, 6)
+        results.loc[2, ["end_true_position_x", "end_true_position_y"]] = (20, 20)
 
-        results[3, "begin_true_position_2d"] = (0, 0)
-        results[3, "position_2d"] = (np.nan, np.nan)
-        results[3, "end_true_position_2d"] = (30, 30)
+        results.loc[3, ["begin_true_position_x", "begin_true_position_y"]] = (0, 0)
+        results.loc[3, ["position_x", 'position_y']] = (np.nan, np.nan)
+        results.loc[3, ["end_true_position_x", "end_true_position_y"]] = (30, 30)
 
         true_position, position_errors, nans_number = plot_absolute_position_error_histogram(results,
                                                                                 return_intermediate_results=True)
-        self.assertTupleEqual((4, 2), true_position.shape)
-        np.testing.assert_equal((10, 0), true_position[0, :])
-        np.testing.assert_equal((0, 20), true_position[1, :])
-        np.testing.assert_equal((10, 10), true_position[2, :])
+        self.assertTupleEqual((4, 3), true_position.shape)
+        np.testing.assert_equal((10, 0, 0), true_position[0, :])
+        np.testing.assert_equal((0, 20, 0), true_position[1, :])
+        np.testing.assert_equal((10, 10, 0), true_position[2, :])
 
         self.assertTupleEqual((3,), position_errors.shape)
         self.assertEqual(5, position_errors[0])
