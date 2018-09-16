@@ -13,6 +13,8 @@
 # along with this program.  If not, see http:#www.gnu.org/licenses/.
 #
 
+import numpy as np
+
 
 class Result:
     def __init__(self):
@@ -27,26 +29,32 @@ class Result:
         self.end_true_position_x = None
         self.end_true_position_y = None
         self.end_true_position_z = None
+        self.reference_position_x = None
+        self.reference_position_y = None
+        self.reference_position_z = None
 
     def to_tuple(self):
         if self.position_dimensions not in (1, 2, 3):
             raise ValueError('Result\'s position have to me in 1, 2 or 3 dimensions')
 
         result = (
-            self.mac_address,
-            self.position_dimensions,
-            self.position_x,
-            self.position_y,
-            self.position_z,
-            self.begin_true_position_x,
-            self.begin_true_position_y,
-            self.begin_true_position_z,
-            self.end_true_position_x,
-            self.end_true_position_y,
-            self.end_true_position_z
+            np.int(self.mac_address),
+            np.int(self.position_dimensions),
+            np.float64(self.position_x),
+            np.float64(self.position_y),
+            np.float64(self.position_z),
+            np.float64(self.begin_true_position_x),
+            np.float64(self.begin_true_position_y),
+            np.float64(self.begin_true_position_z),
+            np.float64(self.end_true_position_x),
+            np.float64(self.end_true_position_y),
+            np.float64(self.end_true_position_z),
+            np.float64(self.reference_position_x),
+            np.float64(self.reference_position_y),
+            np.float64(self.reference_position_z),
         )
 
-        if not all(element is not None for element in result):
+        if not not any(np.isnan(result)):
             raise ValueError('Result tuple cannot contain None values')
 
         return result
