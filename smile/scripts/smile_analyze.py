@@ -21,12 +21,13 @@ import smile.analysis as sa
 import smile.visualization as sv
 from smile.platform.json_configuration import *
 
-__EXPERIMENTS_DIRECTORY = 'experiments'
-__ANALYSER_DIRECTORY = 'smile_algorithm'
+_EXPERIMENTS_DIRECTORY = 'experiments'
+_ANALYSER_DIRECTORY = 'smile_algorithm'
+
 
 def __import_method_module(method_path):
     sys.path.append(method_path)
-    return importlib.import_module(f'{__ANALYSER_DIRECTORY}.algorithm')
+    return importlib.import_module(f'{_ANALYSER_DIRECTORY}.algorithm')
 
 
 def __parse_cmd_arguments():
@@ -44,13 +45,13 @@ def __parse_cmd_arguments():
     if not os.path.isdir(method_path):
         raise RuntimeError(f'{method_path} is not a directory or it doesn\t exist.')
 
-    analyser_path = os.path.join(method_path, __ANALYSER_DIRECTORY)
+    analyser_path = os.path.join(method_path, _ANALYSER_DIRECTORY)
     if not os.path.isdir(analyser_path):
-        raise RuntimeError(f'{method_path} has to contain {__ANALYSER_DIRECTORY} directory.')
+        raise RuntimeError(f'{method_path} has to contain {_ANALYSER_DIRECTORY} directory.')
 
-    experiments_path = os.path.join(method_path, __EXPERIMENTS_DIRECTORY)
+    experiments_path = os.path.join(method_path, _EXPERIMENTS_DIRECTORY)
     if not os.path.isdir(experiments_path):
-        raise RuntimeError(f'{method_path} has to contain {__EXPERIMENTS_DIRECTORY} directory.')
+        raise RuntimeError(f'{method_path} has to contain {_EXPERIMENTS_DIRECTORY} directory.')
 
     # Validate results_path
     if not os.path.isdir(results_path):
@@ -60,7 +61,7 @@ def __parse_cmd_arguments():
 
 
 def __get_json_file_path(method_path, experiment_name):
-    path = os.path.join(method_path, __EXPERIMENTS_DIRECTORY, experiment_name, 'algorithm.json')
+    path = os.path.join(method_path, _EXPERIMENTS_DIRECTORY, experiment_name, 'algorithm.json')
     if not os.path.isfile(path):
         raise RuntimeError(f'{path} is not valid path to JSON file')
 
@@ -76,11 +77,10 @@ def main():
 
     analyser = method_module.Algorithm(configuration)
     results, anchors = analyser.run_offline(results_path)
-
-    unique_results = sa.squeeze_results(results)
-    sv.plot_absolute_position_error_cdf(unique_results)
-    sv.plot_absolute_position_error_surface(unique_results, anchors)
-    sv.plot_absolute_position_error_histogram(unique_results)
+    x=sa.compute_basic_statistics(results)
+    sv.plot_absolute_position_error_cdf(results)
+    sv.plot_absolute_position_error_surface(results, anchors)
+    sv.plot_absolute_position_error_histogram(results)
 
 
 if __name__ == '__main__':
