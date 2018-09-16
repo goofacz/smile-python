@@ -17,20 +17,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.linalg as npla
 
+_position_columns = ['position_x', 'position_y', 'position_z']
+_reference_position_columns = ['reference_position_x', 'reference_position_y', 'reference_position_z']
 
-def plot_absolute_position_error_histogram(results, return_intermediate_results=False):
-    # FIXME
-    position_coordinates = ['position_x', 'position_y', 'position_z']
-    begin_position_coordinates = ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
-    end_position_coordinates = ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
 
-    # Mobile node cloud move during localization procedure
-    true_positions = (results[begin_position_coordinates].values + results[end_position_coordinates].values) / 2
-    position_errors = npla.norm(true_positions - results[position_coordinates].values, axis=1)
+def plot_absolute_position_error_histogram(results, mac_addresses=None, reference_positions=None):
+    if mac_addresses:
+        results = results[results.mac_address.isin(mac_addresses)]
+    if reference_positions:
+        results = results[results[_reference_position_columns].isin(mac_addresses)]
 
-    # Process data (remove NaNs)
-    nans_number = np.count_nonzero(np.isnan(position_errors))
-    position_errors = position_errors[np.isfinite(position_errors)]
+    position_errors = npla.norm(results[_reference_position_columns].values - results[_position_columns].values, axis=1)
 
     plt.hist(position_errors)
     plt.title('Histogram of absolute error values')
@@ -39,26 +36,24 @@ def plot_absolute_position_error_histogram(results, return_intermediate_results=
     plt.grid(True)
     plt.show()
 
-    if return_intermediate_results:
-        return true_positions, position_errors, nans_number
 
+def plot_absolute_position_error_surface(results, anchors=None, mac_addresses=None, reference_positions=None):
+    if mac_addresses:
+        results = results[results.mac_address.isin(mac_addresses)]
+    if reference_positions:
+        results = results[results[_reference_position_columns].isin(mac_addresses)]
 
-def plot_absolute_position_error_surface(results, anchors=None, return_intermediate_results=False):
-    # FIXME
-    position_coordinates = ['position_x', 'position_y', 'position_z']
-    begin_position_coordinates = ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
-    end_position_coordinates = ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
+    reference_positions = results[_reference_position_columns]
+    position_errors = npla.norm(reference_positions.values - results[_position_columns].values, axis=1)
 
-    # Mobile node cloud move during localization procedure
-    true_positions = (results[begin_position_coordinates].values + results[end_position_coordinates].values) / 2
-    position_errors = npla.norm(true_positions - results[position_coordinates], axis=1)
-
-    x, y = np.meshgrid(np.unique(true_positions[:, 0]), np.unique(true_positions[:, 1]), indexing='xy')
+    x, y = np.meshgrid(reference_positions.reference_position_x.unique(),
+                       reference_positions.reference_position_x.unique(),
+                       indexing='xy')
     z = np.zeros(x.shape)
 
     # Assign position errors (z) to correct node coordinates (x, y)
-    for i in range(0, len(true_positions)):
-        tmp_true_position = true_positions[i, :]
+    for i in range(0, len(reference_positions)):
+        tmp_true_position = reference_positions.iloc[i, :]
         tmp_position_error = position_errors[i]
 
         tmp_z_indices = np.where(np.logical_and(x == tmp_true_position[0], y == tmp_true_position[1]))
@@ -100,18 +95,14 @@ def plot_absolute_position_error_surface(results, anchors=None, return_intermedi
     plt.ylabel('Y [m]')
     plt.show()
 
-    if return_intermediate_results:
-        return true_positions, position_errors
 
+def plot_absolute_position_error_cdf(results, mac_addresses=None, reference_positions=None):
+    if mac_addresses:
+        results = results[results.mac_address.isin(mac_addresses)]
+    if reference_positions:
+        results = results[results[_reference_position_columns].isin(mac_addresses)]
 
-def plot_absolute_position_error_cdf(results, return_intermediate_results=False):
-    # FIXME
-    position_coordinates = ['position_x', 'position_y', 'position_z']
-    begin_position_coordinates = ['begin_true_position_x', 'begin_true_position_y', 'begin_true_position_z']
-    end_position_coordinates = ['end_true_position_x', 'end_true_position_y', 'end_true_position_z']
-
-    true_positions = (results[begin_position_coordinates].values + results[end_position_coordinates].values) / 2
-    position_errors = npla.norm(true_positions - results[position_coordinates], axis=1)
+    position_errors = npla.norm(results[_reference_position_columns].values - results[_position_columns].values, axis=1)
     position_errors = np.sort(position_errors)
     n = np.array(range(position_errors.size)) / np.float(position_errors.size)
 
@@ -120,6 +111,3 @@ def plot_absolute_position_error_cdf(results, return_intermediate_results=False)
     plt.title('CDF of absolute position error')
     plt.xlabel('Error [m]')
     plt.show()
-
-    if return_intermediate_results:
-        return position_errors, n
