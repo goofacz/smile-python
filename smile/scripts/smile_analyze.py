@@ -77,7 +77,7 @@ def main():
 
     analyser = method_module.Algorithm(configuration)
     results, anchors = analyser.run_offline(results_path)
-    x=sa.compute_basic_statistics(results)
+
     sv.plot_absolute_position_error_cdf(results)
     sv.plot_absolute_position_error_surface(results, anchors)
     sv.plot_absolute_position_error_histogram(results)
