@@ -14,69 +14,40 @@
 #
 
 import numpy as np
-
-from smile.result import Result
-import smile.results as sresults
+import pandas as pd
 
 
-def _squeeze_results_by_mac_address(results, averaging_method):
-    # FIXME
-    # position_coordinates, begin_position_coordinates, end_position_coordinates = results.determine_dimensions()
-
-    # We want to have single result per mobile node
-    unique_mac_addresses = results.mac_address.unique()
-    unique_results = []  # Results.create_array(len(unique_mac_addresses))
-
-    for i in range(0, len(unique_mac_addresses)):
-        mac_address = unique_mac_addresses[i]
-        tmp_results = results[results['mac_address'] == mac_address]
-
-        unique_result = Result()
-        if averaging_method == 'mean':
-            unique_result.position_x = np.mean(tmp_results['position_x'], axis=0)
-            unique_result.position_y = np.mean(tmp_results['position_y'], axis=0)
-            unique_result.position_z = np.mean(tmp_results['position_z'], axis=0)
-            unique_result.begin_true_position_x = np.mean(tmp_results['begin_true_position_x'], axis=0)
-            unique_result.begin_true_position_y = np.mean(tmp_results['begin_true_position_y'], axis=0)
-            unique_result.begin_true_position_z = np.mean(tmp_results['begin_true_position_z'], axis=0)
-            unique_result.end_true_position_x = np.mean(tmp_results['end_true_position_x'], axis=0)
-            unique_result.end_true_position_y = np.mean(tmp_results['end_true_position_y'], axis=0)
-            unique_result.end_true_position_z = np.mean(tmp_results['end_true_position_z'], axis=0)
-        elif averaging_method == 'max':
-            unique_result.position_x = np.max(tmp_results['position_x'], axis=0)
-            unique_result.position_y = np.max(tmp_results['position_y'], axis=0)
-            unique_result.position_z = np.max(tmp_results['position_z'], axis=0)
-            unique_result.begin_true_position_x = np.max(tmp_results['begin_true_position_x'], axis=0)
-            unique_result.begin_true_position_y = np.max(tmp_results['begin_true_position_y'], axis=0)
-            unique_result.begin_true_position_z = np.max(tmp_results['begin_true_position_z'], axis=0)
-            unique_result.end_true_position_x = np.max(tmp_results['end_true_position_x'], axis=0)
-            unique_result.end_true_position_y = np.max(tmp_results['end_true_position_y'], axis=0)
-            unique_result.end_true_position_z = np.max(tmp_results['end_true_position_z'], axis=0)
-        elif averaging_method == 'min':
-            unique_result.position_x = np.min(tmp_results['position_x'], axis=0)
-            unique_result.position_y = np.min(tmp_results['position_y'], axis=0)
-            unique_result.position_z = np.min(tmp_results['position_z'], axis=0)
-            unique_result.begin_true_position_x = np.min(tmp_results['begin_true_position_x'], axis=0)
-            unique_result.begin_true_position_y = np.min(tmp_results['begin_true_position_y'], axis=0)
-            unique_result.begin_true_position_z = np.min(tmp_results['begin_true_position_z'], axis=0)
-            unique_result.end_true_position_x = np.min(tmp_results['end_true_position_x'], axis=0)
-            unique_result.end_true_position_y = np.min(tmp_results['end_true_position_y'], axis=0)
-            unique_result.end_true_position_z = np.min(tmp_results['end_true_position_z'], axis=0)
-        else:
-            raise ValueError(
-                'Unknown "averaging_method" value passed to squeeze_results(): {0}'.format(averaging_method))
-
-        unique_result.mac_address = mac_address
-        unique_result.position_dimensions = 2 # tmp_results.loc[0, 'position_dimensions']  # FIXME
-        unique_results.append(unique_result)
-
-    unique_results = sresults.create_results(unique_results)
-    return unique_results
+def get_default_groupby_columns():
+    return [
+        'mac_address',
+        'reference_position_x', 'reference_position_y', 'reference_position_z'
+    ]
 
 
-def squeeze_results(results, grouping_method='mac_address', averaging_method='mean'):
-    if grouping_method == 'mac_address':
-        return _squeeze_results_by_mac_address(results, averaging_method)
-    else:
-        raise ValueError(
-            'Unknown "grouping_method" value passed to squeeze_results(): {0}'.format(grouping_method))
+def compute_basic_statistics(results, groupby_columns=None):
+    if not groupby_columns:
+        groupby_columns = get_default_groupby_columns()
+
+    statistics = {
+        'min': np.min,
+        'max': np.max,
+        'mean': np.mean,
+        'std': np.std,
+        'var': np.var,
+        '25%': lambda values: np.percentile(values, 25),
+        '50%': lambda values: np.percentile(values, 50),
+        '75%': lambda values: np.percentile(values, 75),
+    }
+
+    aggregate_functions = {
+        'position_x': statistics,
+        'position_y': statistics,
+        'position_z': statistics,
+    }
+
+    grouped_results = results.groupby(groupby_columns)
+    aggregated_results = grouped_results.aggregate(aggregate_functions)
+    general_counts = pd.DataFrame(grouped_results.size(), index=aggregated_results.index, dtype=np.int64,
+                                  columns=pd.MultiIndex.from_tuples([('positions', 'count')]))
+    aggregated_results = aggregated_results.join(general_counts)
+    return aggregated_results.reset_index()
