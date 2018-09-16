@@ -30,34 +30,18 @@ def get_results_columns():
         'end_true_position_x',
         'end_true_position_y',
         'end_true_position_z',
-    ]
-
-
-def get_reference_position_columns():
-    return [
         'reference_position_x',
         'reference_position_y',
         'reference_position_z',
     ]
 
 
-def _average_reference_position(begin_positions, end_positions):
-    output = (begin_positions.values + end_positions.values) / 2.
-    return pd.DataFrame(output, columns=get_reference_position_columns())
-
-
-def create_results(results, columns=None, reference_positions_function=None):
+def create_results(results, columns=None):
     if not columns:
         columns = get_results_columns()
-    if not reference_positions_function:
-        reference_positions_function = _average_reference_position
 
-    results = pd.DataFrame([row.to_tuple() for row in results], columns=columns, dtype=np.float64)
+    results = pd.DataFrame([row.to_tuple() for row in results], columns=columns)
     if len(results.position_dimensions.unique()) != 1:
         raise ValueError('Position dimensions have to be the same for all results')
 
-    begin_positions = results[['begin_true_position_x', 'begin_true_position_y','begin_true_position_z']]
-    end_positions = results[['end_true_position_x', 'end_true_position_y','end_true_position_z']]
-    reference_positions = reference_positions_function(begin_positions, end_positions)
-    return results.join(reference_positions)
-
+    return results

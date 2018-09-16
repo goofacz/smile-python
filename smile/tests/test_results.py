@@ -14,57 +14,90 @@
 #
 
 import unittest
-from copy import deepcopy
+import numpy as np
+
 from smile.result import Result
+import smile.results as sresults
 
 
-class TestResult(unittest.TestCase):
+class TestResults(unittest.TestCase):
     def setUp(self):
-        self.result = Result()
-        self.result.mac_address = 112233445566
-        self.result.position_dimensions = 2
-        self.result.position_x = 10
-        self.result.position_y = 20
-        self.result.position_z = 30
-        self.result.begin_true_position_x = 400
-        self.result.begin_true_position_y = 500
-        self.result.begin_true_position_z = 600
-        self.result.end_true_position_x = 7000
-        self.result.end_true_position_y = 8000
-        self.result.end_true_position_z = 9000
+        self.result1 = Result()
+        self.result1.mac_address = 112233445566
+        self.result1.position_dimensions = 2
+        self.result1.position_x = 1
+        self.result1.position_y = 2
+        self.result1.position_z = 3
+        self.result1.begin_true_position_x = 0
+        self.result1.begin_true_position_y = 0
+        self.result1.begin_true_position_z = 0
+        self.result1.end_true_position_x = 2
+        self.result1.end_true_position_y = 2
+        self.result1.end_true_position_z = 2
+        self.result1.reference_position_x = 1
+        self.result1.reference_position_y = 1
+        self.result1.reference_position_z = 1
 
-    def test_to_list_success(self):
-        reference_tuple = (
-            112233445566,
-            2,
-            10,
-            20,
-            30,
-            400,
-            500,
-            600,
-            7000,
-            8000,
-            9000
-        )
+        self.result2 = Result()
+        self.result2.mac_address = 212233445566
+        self.result2.position_dimensions = 2
+        self.result2.position_x = 10
+        self.result2.position_y = 20
+        self.result2.position_z = 30
+        self.result2.begin_true_position_x = 10
+        self.result2.begin_true_position_y = 10
+        self.result2.begin_true_position_z = 0
+        self.result2.end_true_position_x = 20
+        self.result2.end_true_position_y = 20
+        self.result2.end_true_position_z = 0
+        self.result2.reference_position_x = 15
+        self.result2.reference_position_y = 15
+        self.result2.reference_position_z = 0
 
-        self.assertSequenceEqual(self.result.to_tuple(), reference_tuple)
+        self.result3 = Result()
+        self.result3.mac_address = 312233445566
+        self.result3.position_dimensions = 2
+        self.result3.position_x = 100
+        self.result3.position_y = 200
+        self.result3.position_z = 300
+        self.result3.begin_true_position_x = 100
+        self.result3.begin_true_position_y = 100
+        self.result3.begin_true_position_z = 0
+        self.result3.end_true_position_x = 100
+        self.result3.end_true_position_y = 100
+        self.result3.end_true_position_z = 100
+        self.result3.reference_position_x = 100
+        self.result3.reference_position_y = 100
+        self.result3.reference_position_z = 50
 
-    def test_to_list_catch_nones(self):
-        none_result = Result()
+        self.reference_results = [self.result1, self.result2, self.result3]
+
+    def test_create_array_success(self):
+        results = sresults.create_results(self.reference_results)
+
+        self.assertEqual(results.shape, (3, 14))
+        np.testing.assert_array_equal(results.iloc[0, :], self.result1.to_tuple())
+        np.testing.assert_array_equal(results.iloc[1, :], self.result2.to_tuple())
+        np.testing.assert_array_equal(results.iloc[2, :], self.result3.to_tuple())
+
+    def test_create_array_different_position_dimensions(self):
+        self.result1.position_dimensions = 2
+        self.result2.position_dimensions = 3
+        self.result3.position_dimensions = 2
+
+        self.reference_results = [self.result1, self.result2, self.result3]
+
         with self.assertRaises(ValueError):
-            none_result.to_tuple()
+            sresults.create_results(self.reference_results)
 
-        none_result = deepcopy(self.result)
-        none_result.position_z = None
+    def test_create_array_invalid_position_dimensions(self):
+        self.result1.position_dimensions = -1
+        self.result2.position_dimensions = 4
+        self.result3.position_dimensions = 5
+
         with self.assertRaises(ValueError):
-            none_result.to_tuple()
-
-        none_result = deepcopy(self.result)
-        none_result.begin_true_position_z = None
+            sresults.create_results([self.result1])
         with self.assertRaises(ValueError):
-            none_result.to_tuple()
-
-
-if __name__ == '__main__':
-    unittest.main()
+            sresults.create_results([self.result2])
+        with self.assertRaises(ValueError):
+            sresults.create_results([self.result3])
